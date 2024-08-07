@@ -1,5 +1,6 @@
 package com.musicapp.userservice.entity;
 
+import com.musicapp.userservice.dto.PublicUserDetailsDto;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -106,5 +107,14 @@ public class User {
         this.country = country;
         this.email = email;
         this.profilePicture = profilePicture;
+    }
+
+    public PublicUserDetailsDto getPublicUserDetails() {
+        return new PublicUserDetailsDto(
+                this.username,
+                this.profilePicture,
+                this.firstName,
+                this.lastName
+        );
     }
 }
