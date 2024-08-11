@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user-service")
 @Validated
 public class UserController {
     UserService userService;
