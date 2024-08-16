@@ -1,4 +1,4 @@
 package com.musicapp.mainservice.dto.request;
 
-public record UserCreateRequest() {
+public record JwtValidateRequest(String token) {
 }

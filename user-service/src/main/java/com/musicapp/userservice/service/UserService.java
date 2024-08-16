@@ -38,6 +38,7 @@ public class UserService {
 
     @Transactional
     public UUID createUser(UserModifyRequest userData) {
+        validateUserDetailsForCreation(userData);
         User user = new User(
                 userData.firstName(),
                 userData.lastName(),
@@ -81,6 +82,13 @@ public class UserService {
     }
 
     private void validateUserDetails(UserModifyRequest userData) {
+//        if (isUsernameTaken(userData.username())) {
+//            throw new ValidateException("Username taken");
+//        }
+    }
+
+    private void validateUserDetailsForCreation(UserModifyRequest userData) {
+        validateUserDetails(userData);
         if (isUsernameTaken(userData.username())) {
             throw new ValidateException("Username taken");
         }

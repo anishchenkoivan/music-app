@@ -1,5 +1,6 @@
 package com.musicapp.authservice.security;
 
+import com.musicapp.authservice.exception.TokenInvalidException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -37,8 +38,12 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isValidToken(String token, UUID userId) {
-        return userId.equals(getUserId(token)) && !tokenExpired(token);
+    public boolean isValidToken(String token) {
+        return !tokenExpired(token);
+    }
+
+    public UUID getUserId(String token) {
+        return UUID.fromString(getClaims(token, Claims::getSubject));
     }
 
     private boolean tokenExpired(String token) {
@@ -49,21 +54,21 @@ public class JwtService {
         return getClaims(token, Claims::getExpiration);
     }
 
-    private UUID getUserId(String token) {
-        return UUID.fromString(getClaims(token, Claims::getSubject));
-    }
-
     private <T> T getClaims(String token, Function<Claims, T> resolver) {
         Claims claims = getAllClaims(token);
         return resolver.apply(claims);
     }
 
     private Claims getAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (Exception e) {
+            throw new TokenInvalidException("Token is invalid");
+        }
     }
 
 }

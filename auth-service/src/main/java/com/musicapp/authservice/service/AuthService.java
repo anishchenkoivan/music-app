@@ -1,6 +1,7 @@
 package com.musicapp.authservice.service;
 
 import com.musicapp.authservice.entity.User;
+import com.musicapp.authservice.exception.TokenInvalidException;
 import com.musicapp.authservice.exception.TokenIssueException;
 import com.musicapp.authservice.exception.UserNotFoundException;
 import com.musicapp.authservice.repository.UserRepository;
@@ -51,7 +52,12 @@ public class AuthService {
         return jwtService.generateToken(user.getId());
     }
 
-    public boolean validateToken(String token, UUID userId) {
-        return jwtService.isValidToken(token, userId);
+    public UUID validateToken(String token) {
+        UUID userId = jwtService.getUserId(token);
+        boolean userExists = userRepository.existsById(userId);
+        if (!jwtService.isValidToken(token) || !userExists) {
+            throw new TokenInvalidException("Token is not valid");
+        }
+        return userId;
     }
 }

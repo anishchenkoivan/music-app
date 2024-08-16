@@ -1,10 +1,10 @@
 package com.musicapp.userservice.controller;
 
 import com.musicapp.userservice.dto.PublicUserDetailsDto;
+import com.musicapp.userservice.dto.UserDetailsDto;
 import com.musicapp.userservice.dto.request.GetUserIdRequest;
 import com.musicapp.userservice.dto.request.UserModifyRequest;
 import com.musicapp.userservice.dto.response.ApiError;
-import com.musicapp.userservice.entity.User;
 import com.musicapp.userservice.exception.ValidateException;
 import com.musicapp.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/new")
+    @PostMapping("/create-user")
     public UUID createUser(@RequestBody UserModifyRequest request) {
         return userService.createUser(request);
     }
@@ -38,8 +38,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/all")
-    public User getAllUserDetails(@PathVariable UUID id) {
-        return userService.getUser(id);
+    public UserDetailsDto getAllUserDetails(@PathVariable UUID id) {
+        return userService.getUser(id).toDto();
     }
 
     @GetMapping("/{id}/public")
@@ -47,7 +47,7 @@ public class UserController {
         return userService.getPublicUserDetails(id);
     }
 
-    @GetMapping("/get-id")
+    @PostMapping("/get-id")
     public UUID getIdByEmailOrUsername(@RequestBody GetUserIdRequest request) {
         return userService.getId(request.email(), request.username());
     }

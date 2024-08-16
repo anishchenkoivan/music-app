@@ -4,6 +4,7 @@ import com.musicapp.authservice.dto.request.JwtIssueRequest;
 import com.musicapp.authservice.dto.request.JwtValidateRequest;
 import com.musicapp.authservice.dto.request.UserUpdateRequest;
 import com.musicapp.authservice.dto.response.ApiError;
+import com.musicapp.authservice.exception.TokenInvalidException;
 import com.musicapp.authservice.exception.TokenIssueException;
 import com.musicapp.authservice.exception.UserNotFoundException;
 import com.musicapp.authservice.service.AuthService;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth-service")
@@ -27,27 +30,27 @@ public class AuthController {
         return "ok";
     }
 
-    @GetMapping("/get-token")
+    @PostMapping("/get-token")
     public String IssueToken(@RequestBody JwtIssueRequest request) {
         return authService.issueToken(
                 request.id(),
                 request.password());
     }
 
-    @GetMapping("/validate")
-    public boolean validateToken(@RequestBody JwtValidateRequest request) {
-        return authService.validateToken(request.token(), request.userId());
+    @PostMapping("/validate")
+    public UUID validateToken(@RequestBody JwtValidateRequest request) {
+        return authService.validateToken(request.token());
     }
 
     @PostMapping("/create-user")
-    public void CreateUser(@RequestBody UserUpdateRequest request) {
+    public void createUser(@RequestBody UserUpdateRequest request) {
         authService.createUser(
                 request.id(),
                 request.password()
         );
     }
 
-    @PutMapping("/update-user/{id}")
+    @PutMapping("/update-user")
     public void updateUser(@RequestBody UserUpdateRequest request) {
         authService.ModifyUser(
                 request.id(),
@@ -63,8 +66,8 @@ public class AuthController {
         );
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ApiError> TokenIssueExceptionHandler(TokenIssueException e) {
+    @ExceptionHandler({TokenIssueException.class, TokenInvalidException.class})
+    public ResponseEntity<ApiError> TokenIssueExceptionHandler(RuntimeException e) {
         return new ResponseEntity<>(
                 new ApiError(e.getMessage()),
                 HttpStatus.UNAUTHORIZED
