@@ -82,9 +82,6 @@ public class UserService {
     }
 
     private void validateUserDetails(UserModifyRequest userData) {
-//        if (isUsernameTaken(userData.username())) {
-//            throw new ValidateException("Username taken");
-//        }
     }
 
     private void validateUserDetailsForCreation(UserModifyRequest userData) {

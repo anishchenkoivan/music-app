@@ -115,7 +115,8 @@ public class User {
                 this.username,
                 this.profilePicture,
                 this.firstName,
-                this.lastName
+                this.lastName,
+                this.bio
         );
     }
 
