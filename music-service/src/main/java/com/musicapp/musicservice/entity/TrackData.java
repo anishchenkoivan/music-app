@@ -6,13 +6,10 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name="tracks")
-public class Track {
+@Table(name="trackdata")
+public class TrackData {
     @Id
     private UUID id;
-    private String title;
-//    @OneToMany(mappedBy = )
-    private Artist[] artist;
     private ZonedDateTime creationDateTime;
-    private String cover;
+    private Byte[] source;
 }
