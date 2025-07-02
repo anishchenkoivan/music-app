@@ -1,15 +1,18 @@
 package com.musicapp.userservice.controller;
 
-import com.musicapp.userservice.dto.PublicUserDetailsDto;
-import com.musicapp.userservice.dto.UserDetailsDto;
 import com.musicapp.userservice.dto.request.GetUserIdRequest;
+import com.musicapp.userservice.dto.request.UserCreateRequest;
 import com.musicapp.userservice.dto.request.UserModifyRequest;
 import com.musicapp.userservice.dto.response.ApiError;
+import com.musicapp.userservice.exception.CreateException;
 import com.musicapp.userservice.exception.ValidateException;
 import com.musicapp.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user-service")
+@RequestMapping("/user")
 @Validated
 public class UserController {
     UserService userService;
@@ -28,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping("/create-user")
-    public UUID createUser(@RequestBody UserModifyRequest request) {
+    public UUID createUser(@RequestBody UserCreateRequest request) {
         return userService.createUser(request);
     }
 
@@ -37,14 +40,18 @@ public class UserController {
         userService.updateUser(id, request);
     }
 
-    @GetMapping("/{id}/all")
-    public UserDetailsDto getAllUserDetails(@PathVariable UUID id) {
-        return userService.getUser(id).toDto();
-    }
-
-    @GetMapping("/{id}/public")
-    public PublicUserDetailsDto getPublicUserDetails(@PathVariable UUID id) {
-        return userService.getPublicUserDetails(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserDetails(@PathVariable UUID id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.ok(userService.getPublicUserDetails(id));
+        } else {
+            UUID authenticatedUserId = UUID.fromString(authentication.getPrincipal().toString());
+            if (id.equals(authenticatedUserId)) {
+                return ResponseEntity.ok(userService.getUser(id).toDto());
+            }
+        }
+        return ResponseEntity.ok(userService.getPublicUserDetails(id));
     }
 
     @PostMapping("/get-id")
@@ -65,6 +72,14 @@ public class UserController {
         return new ResponseEntity<>(
                 new ApiError(e.getMessage()),
                 HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> CreateExceptionHandler(CreateException e) {
+        return new ResponseEntity<>(
+                new ApiError(e.getMessage()),
+                HttpStatus.BAD_REQUEST
         );
     }
 }

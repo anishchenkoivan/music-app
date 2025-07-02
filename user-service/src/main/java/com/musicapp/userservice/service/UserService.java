@@ -1,10 +1,15 @@
 package com.musicapp.userservice.service;
 
 import com.musicapp.userservice.dto.PublicUserDetailsDto;
+import com.musicapp.userservice.dto.request.UserCreateRequest;
 import com.musicapp.userservice.dto.request.UserModifyRequest;
+import com.musicapp.userservice.dto.request.UserSecurityModifyRequest;
 import com.musicapp.userservice.entity.User;
+import com.musicapp.userservice.exception.CreateException;
 import com.musicapp.userservice.exception.ValidateException;
+import com.musicapp.userservice.gateway.AuthClient;
 import com.musicapp.userservice.repository.UserRepository;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +20,12 @@ import java.util.UUID;
 @Service
 public class UserService {
     UserRepository userRepository;
+    AuthClient authClient;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AuthClient authClient) {
         this.userRepository = userRepository;
+        this.authClient = authClient;
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +44,8 @@ public class UserService {
     }
 
     @Transactional
-    public UUID createUser(UserModifyRequest userData) {
+    public UUID createUser(UserCreateRequest userCreationData) {
+        UserModifyRequest userData = userCreationData.userModifyRequest();
         validateUserDetailsForCreation(userData);
         User user = new User(
                 userData.firstName(),
@@ -47,7 +55,15 @@ public class UserService {
                 userData.country(),
                 userData.email(),
                 userData.profilePicture());
-        return userRepository.save(user).getId();
+        UUID id = userRepository.save(user).getId();
+        UserSecurityModifyRequest userSecurityModifyRequest = new UserSecurityModifyRequest(id, userCreationData.password());
+        try {
+            authClient.createUser(userSecurityModifyRequest);
+        } catch (FeignException e) {
+            userRepository.deleteById(id);
+            throw new CreateException("User creation failed");
+        }
+        return id;
     }
 
     @Transactional(readOnly = true)

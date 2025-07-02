@@ -25,11 +25,6 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "ok";
-    }
-
     @PostMapping("/get-token")
     public String IssueToken(@RequestBody JwtIssueRequest request) {
         return authService.issueToken(
