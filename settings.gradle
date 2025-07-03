@@ -1,5 +1,0 @@
-rootProject.name = 'musicapp'
-include 'main-service'
-include 'user-service'
-include 'auth-service'
-

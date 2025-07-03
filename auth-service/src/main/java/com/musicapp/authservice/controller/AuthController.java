@@ -2,6 +2,7 @@ package com.musicapp.authservice.controller;
 
 import com.musicapp.authservice.dto.request.JwtIssueRequest;
 import com.musicapp.authservice.dto.request.JwtValidateRequest;
+import com.musicapp.authservice.dto.request.UserCreateRequest;
 import com.musicapp.authservice.dto.request.UserUpdateRequest;
 import com.musicapp.authservice.dto.response.ApiError;
 import com.musicapp.authservice.exception.TokenInvalidException;
@@ -11,23 +12,20 @@ import com.musicapp.authservice.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth-service")
+@RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
 
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "ok";
     }
 
     @PostMapping("/get-token")
@@ -43,7 +41,7 @@ public class AuthController {
     }
 
     @PostMapping("/create-user")
-    public void createUser(@RequestBody UserUpdateRequest request) {
+    public void createUser(@RequestBody UserCreateRequest request) {
         authService.createUser(
                 request.id(),
                 request.password()
@@ -52,8 +50,14 @@ public class AuthController {
 
     @PutMapping("/update-user")
     public void updateUser(@RequestBody UserUpdateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return;
+        }
+        UUID id = UUID.fromString(authentication.getName());
         authService.ModifyUser(
-                request.id(),
+                id,
                 request.password()
         );
     }

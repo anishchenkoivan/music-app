@@ -52,6 +52,7 @@ public class AuthService {
         return jwtService.generateToken(user.getId());
     }
 
+    @Transactional(readOnly = true)
     public UUID validateToken(String token) {
         UUID userId = jwtService.getUserId(token);
         boolean userExists = userRepository.existsById(userId);
