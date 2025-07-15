@@ -37,7 +37,21 @@ services:
     volumes:
       - postgres_auth_data:/var/lib/postgresql/data
 
+  minio_streaming_service:
+    image: minio/minio:latest
+    container_name: minio_streaming_service
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_streaming_data:/data
+
 volumes:
   postgres_user_data:
   postgres_music_data:
   postgres_auth_data:
+  minio_streaming_data:
