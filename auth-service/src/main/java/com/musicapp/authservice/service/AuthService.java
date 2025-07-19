@@ -1,5 +1,6 @@
 package com.musicapp.authservice.service;
 
+import com.musicapp.authservice.entity.Role;
 import com.musicapp.authservice.entity.User;
 import com.musicapp.authservice.exception.TokenInvalidException;
 import com.musicapp.authservice.exception.TokenIssueException;
@@ -34,11 +35,17 @@ public class AuthService {
     }
 
     @Transactional
-    public void ModifyUser(UUID id, String password) {
+    public void modifyUserPassword(UUID id, String password) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Failed to find user with id: " + id));
         user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void makeAdmin(UUID id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Failed to find user with id: " + id));
+        user.addRole(Role.ADMIN);
     }
 
     @Transactional(readOnly = true)
@@ -53,12 +60,12 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public UUID validateToken(String token) {
+    public User validateToken(String token) {
         UUID userId = jwtService.getUserId(token);
-        boolean userExists = userRepository.existsById(userId);
-        if (!jwtService.isValidToken(token) || !userExists) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Failed to find user with id: " + userId));
+        if (!jwtService.isValidToken(token, user)) {
             throw new TokenInvalidException("Token is not valid");
         }
-        return userId;
+        return user;
     }
 }

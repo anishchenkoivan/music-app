@@ -17,6 +17,7 @@ public class Artist {
     @Id
     private UUID id;
     private String name;
+    private UUID userId;
     @ManyToMany(mappedBy = "artists", fetch = FetchType.LAZY)
     private Set<TrackData> tracks;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artist")

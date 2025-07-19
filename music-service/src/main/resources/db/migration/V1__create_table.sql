@@ -7,7 +7,8 @@ CREATE TABLE track_data (
 
 CREATE TABLE artists (
     id UUID PRIMARY KEY,
-    name TEXT NOT NULL CHECK (name <> '')
+    name TEXT NOT NULL CHECK (name <> ''),
+    user_id UUID DEFAULT NULL
 );
 
 CREATE TABLE albums (

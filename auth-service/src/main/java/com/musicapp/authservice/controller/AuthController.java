@@ -37,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/validate")
     public UUID validateToken(@RequestBody JwtValidateRequest request) {
-        return authService.validateToken(request.token());
+        return authService.validateToken(request.token()).getId();
     }
 
     @PostMapping("/create-user")
@@ -56,7 +56,7 @@ public class AuthController {
             return;
         }
         UUID id = UUID.fromString(authentication.getName());
-        authService.ModifyUser(
+        authService.modifyUserPassword(
                 id,
                 request.password()
         );

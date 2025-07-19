@@ -1,5 +1,7 @@
 package com.musicapp.authservice.security;
 
+import com.musicapp.authservice.entity.Role;
+import com.musicapp.authservice.entity.User;
 import com.musicapp.authservice.exception.TokenInvalidException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -9,9 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -33,13 +35,15 @@ public class JwtService {
         return Jwts.builder()
                 .subject(userId.toString())
                 .issuedAt(new Date())
+                .claim("roles", Set.of(Role.USER))
                 .expiration(new Date(System.currentTimeMillis() + expirationTimeInMillis))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public boolean isValidToken(String token) {
-        return !tokenExpired(token);
+    public boolean isValidToken(String token, User user) {
+        return !tokenExpired(token)
+                && rolesMatch(token, user.getRoles());
     }
 
     public UUID getUserId(String token) {
@@ -48,6 +52,22 @@ public class JwtService {
 
     private boolean tokenExpired(String token) {
         return getExpiration(token).before(new Date());
+    }
+
+    private boolean rolesMatch(String token, Set<Role> rolesFromUser) {
+        var rawRoles = getClaims(token, claims -> claims.get("roles", Set.class));
+        if (rawRoles == null) {
+            return true;
+        }
+
+        Set<Role> rolesFromToken = ((Collection<?>) rawRoles).stream()
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .map(String::toUpperCase)
+                .map(Role::valueOf)
+                .collect(Collectors.toSet());
+
+        return rolesFromUser.containsAll(rolesFromToken);
     }
 
     private Date getExpiration(String token) {
