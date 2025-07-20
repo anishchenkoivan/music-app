@@ -26,4 +26,5 @@ public class TrackData {
             inverseJoinColumns = @JoinColumn(name = "artist_id")
     )
     private Set<Artist> artists;
+    private boolean isValid;
 }

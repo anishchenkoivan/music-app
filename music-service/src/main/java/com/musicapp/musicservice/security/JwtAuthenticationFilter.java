@@ -1,8 +1,8 @@
-package com.musicapp.userservice.security;
+package com.musicapp.musicservice.security;
 
-import com.musicapp.userservice.dto.request.JwtValidateRequest;
-import com.musicapp.userservice.dto.response.TokenValidateResponse;
-import com.musicapp.userservice.gateway.AuthClient;
+import com.musicapp.musicservice.dto.request.JwtValidateRequest;
+import com.musicapp.musicservice.dto.response.TokenValidateResponse;
+import com.musicapp.musicservice.gateway.AuthClient;
 import feign.FeignException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,20 +11,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AuthClient authClient;
 
     @Autowired
-    public JwtAuthenticationFilter(AuthClient authclient) {
-        this.authClient = authclient;
+    public JwtAuthenticationFilter(AuthClient authClient) {
+        this.authClient = authClient;
     }
 
     @Override
@@ -32,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
         TokenValidateResponse details = validateTokenAndGetUserDetails(token);
         if (token != null && details != null) {
-            var auth = new UsernamePasswordAuthenticationToken(details.id(), null, null);
+            List<SimpleGrantedAuthority> authorities = details.roles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
+            var auth = new UsernamePasswordAuthenticationToken(details.id(), null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

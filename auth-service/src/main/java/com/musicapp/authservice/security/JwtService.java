@@ -30,12 +30,12 @@ public class JwtService {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
 
-    public String generateToken(UUID userId) {
+    public String generateToken(User user) {
         long expirationTimeInMillis = expirationTimeInSeconds * 1000;
         return Jwts.builder()
-                .subject(userId.toString())
+                .subject(user.getId().toString())
                 .issuedAt(new Date())
-                .claim("roles", Set.of(Role.USER))
+                .claim("roles", user.getRoles())
                 .expiration(new Date(System.currentTimeMillis() + expirationTimeInMillis))
                 .signWith(secretKey)
                 .compact();

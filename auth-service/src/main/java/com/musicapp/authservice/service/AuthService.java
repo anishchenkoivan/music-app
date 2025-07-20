@@ -56,7 +56,7 @@ public class AuthService {
             throw new TokenIssueException("Failed to issue token, password is incorrect");
         }
 
-        return jwtService.generateToken(user.getId());
+        return jwtService.generateToken(user);
     }
 
     @Transactional(readOnly = true)

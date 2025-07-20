@@ -5,6 +5,9 @@ import com.musicapp.authservice.dto.request.JwtValidateRequest;
 import com.musicapp.authservice.dto.request.UserCreateRequest;
 import com.musicapp.authservice.dto.request.UserUpdateRequest;
 import com.musicapp.authservice.dto.response.ApiError;
+import com.musicapp.authservice.dto.response.TokenValidateResponse;
+import com.musicapp.authservice.entity.Role;
+import com.musicapp.authservice.entity.User;
 import com.musicapp.authservice.exception.TokenInvalidException;
 import com.musicapp.authservice.exception.TokenIssueException;
 import com.musicapp.authservice.exception.UserNotFoundException;
@@ -36,8 +39,12 @@ public class AuthController {
     }
 
     @PostMapping("/validate")
-    public UUID validateToken(@RequestBody JwtValidateRequest request) {
-        return authService.validateToken(request.token()).getId();
+    public TokenValidateResponse validateToken(@RequestBody JwtValidateRequest request) {
+        User user = authService.validateToken(request.token());
+        return new TokenValidateResponse(
+                user.getId(),
+                user.getRoles().stream().map(Enum::name).toList()
+        );
     }
 
     @PostMapping("/create-user")
