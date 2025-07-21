@@ -3,7 +3,6 @@ package com.musicapp.streamingservice.controller;
 import com.musicapp.streamingservice.dto.AudioStreamingDto;
 import com.musicapp.streamingservice.service.StreamingService;
 import com.musicapp.streamingservice.util.Range;
-import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,11 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 
 @RestController
 @RequestMapping("/audio")
@@ -29,7 +23,7 @@ public class StreamingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StreamingResponseBody> streamAudio(@PathVariable String id, @RequestHeader HttpHeaders headers) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public ResponseEntity<StreamingResponseBody> streamAudio(@PathVariable String id, @RequestHeader HttpHeaders headers) {
         AudioStreamingDto dto = streamingService.stream(id, headers.getFirst(HttpHeaders.RANGE));
         Range range = dto.range();
         StreamingResponseBody body = dto.body();
