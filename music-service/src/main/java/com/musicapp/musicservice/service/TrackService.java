@@ -95,4 +95,11 @@ public class TrackService {
                         .stream().map(trackFactory::toTrackDto).toList()
         );
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void trackDataUploaded(UUID id) {
+        TrackData trackData = getTrackDataEntityById(id);
+        trackData.setValid(true);
+        trackDataRepository.save(trackData);
+    }
 }
