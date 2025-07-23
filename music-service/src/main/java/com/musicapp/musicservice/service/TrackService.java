@@ -2,9 +2,15 @@ package com.musicapp.musicservice.service;
 
 import com.musicapp.musicservice.dto.TrackDto;
 import com.musicapp.musicservice.dto.request.TrackDataModifyRequest;
+import com.musicapp.musicservice.dto.request.TrackViewModifyRequest;
+import com.musicapp.musicservice.dto.response.ArtistTracksResponse;
 import com.musicapp.musicservice.dto.response.TrackDataUploadResponse;
+import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackData;
+import com.musicapp.musicservice.entity.TrackView;
+import com.musicapp.musicservice.exception.CopyrightException;
+import com.musicapp.musicservice.repository.AlbumRepository;
 import com.musicapp.musicservice.repository.TrackDataRepository;
 import com.musicapp.musicservice.repository.TrackViewRepository;
 import com.musicapp.musicservice.security.JwtService;
@@ -14,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,14 +32,16 @@ public class TrackService {
     private final ArtistService artistService;
     private final JwtService jwtService;
     private final TrackFactory trackFactory;
+    private final AlbumRepository albumRepository;
 
     @Autowired
-    public TrackService(TrackViewRepository trackViewRepository, TrackDataRepository trackDataRepository, ArtistService artistService, JwtService jwtService, TrackFactory trackFactory) {
+    public TrackService(TrackViewRepository trackViewRepository, TrackDataRepository trackDataRepository, ArtistService artistService, JwtService jwtService, TrackFactory trackFactory, AlbumRepository albumRepository) {
         this.trackViewRepository = trackViewRepository;
         this.trackDataRepository = trackDataRepository;
         this.artistService = artistService;
         this.jwtService = jwtService;
         this.trackFactory = trackFactory;
+        this.albumRepository = albumRepository;
     }
 
     @Transactional(readOnly = true)
@@ -51,5 +60,39 @@ public class TrackService {
     @Transactional(propagation = Propagation.REQUIRED)
     public TrackData getTrackDataEntityById(UUID id) {
         return trackDataRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void updateTrackData(UUID id, TrackDataModifyRequest request) {
+        TrackData trackData = trackDataRepository.findById(id).orElseThrow();
+        trackData.setTitle(request.title());
+        List<Album> albumsContainingTrackData = albumRepository.findDistinctByTracks_TrackData(trackData);
+        Set<Artist> artists = request.artistIds().stream().map(artistService::getArtistEntityById).collect(Collectors.toSet());
+        for (Album album : albumsContainingTrackData) {
+            if (!artists.contains(album.getArtist())) {
+                throw new CopyrightException("Artist " + album.getArtist() + " must be present");
+            }
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void updateTrackView(UUID id, TrackViewModifyRequest request) {
+        TrackView trackView = trackViewRepository.findById(id).orElseThrow();
+        trackView.setTitle(request.title());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verifyTrackOwnerShip(UUID trackDataId, UUID artistId) {
+        TrackData trackData = trackDataRepository.findById(trackDataId).orElseThrow();
+        return trackData.getArtists().contains(artistService.getArtistEntityById(artistId));
+    }
+
+    @Transactional(readOnly = true)
+    public ArtistTracksResponse getTracksForArtist(UUID artistId) {
+        Artist artist = artistService.getArtistEntityById(artistId);
+        return new ArtistTracksResponse(
+                trackViewRepository.findByTrackData_ArtistsContains(artist)
+                        .stream().map(trackFactory::toTrackDto).toList()
+        );
     }
 }

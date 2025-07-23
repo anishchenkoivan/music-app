@@ -3,6 +3,7 @@ package com.musicapp.musicservice.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -14,8 +15,10 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Album {
     @Id
+    @EqualsAndHashCode.Include
     private UUID id;
     private String title;
     @ManyToOne

@@ -4,6 +4,7 @@ import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
 import com.musicapp.musicservice.dto.request.TrackViewCreateRequest;
 import com.musicapp.musicservice.dto.response.AlbumCreateResponse;
+import com.musicapp.musicservice.dto.response.ArtistAlbumsResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackView;
@@ -65,5 +66,14 @@ public class AlbumService {
         }
         albumRepository.save(album);
         return new AlbumCreateResponse(album.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public ArtistAlbumsResponse getAlbumsForArtist(UUID artistId) {
+        Artist artist = artistService.getArtistEntityById(artistId);
+        return new ArtistAlbumsResponse(
+                albumRepository.findByArtist(artist)
+                        .stream().map(albumFactory::toAlbumDto).toList()
+        );
     }
 }
