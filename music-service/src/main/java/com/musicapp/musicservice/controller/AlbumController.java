@@ -7,8 +7,13 @@ import com.musicapp.musicservice.dto.response.AlbumCreateResponse;
 import com.musicapp.musicservice.dto.response.AlbumsSearchResponse;
 import com.musicapp.musicservice.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController()
@@ -27,8 +32,10 @@ public class AlbumController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("isAuthenticated()")
     AlbumCreateResponse createAlbum(@RequestBody AlbumGeneralCreateRequest request) {
-        return albumService.createAlbum(new AlbumCreateRequest(null, null, request));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return albumService.createAlbum(new AlbumCreateRequest(UUID.fromString(authentication.getPrincipal().toString()), LocalDate.now(), request));
     }
 
     @GetMapping("/search")

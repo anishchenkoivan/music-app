@@ -7,6 +7,7 @@ import com.musicapp.musicservice.dto.response.AlbumCreateResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackView;
+import com.musicapp.musicservice.exception.CopyrightException;
 import com.musicapp.musicservice.repository.AlbumRepository;
 import com.musicapp.musicservice.util.AlbumFactory;
 import com.musicapp.musicservice.util.TrackFactory;
@@ -57,6 +58,9 @@ public class AlbumService {
         Artist artist = artistService.getArtistEntityById(albumCreateRequest.artistId());
         Album album = albumFactory.album(albumCreateRequest.generalData().title(), artist);
         for (TrackView trackView : tracks) {
+            if (!trackView.getTrackData().getArtists().contains(artist)) {
+                throw new CopyrightException("Track " + trackView.getTrackData().getTitle() + " does not belong to artist " + artist.getName());
+            }
             album.addTrack(trackView);
         }
         albumRepository.save(album);
