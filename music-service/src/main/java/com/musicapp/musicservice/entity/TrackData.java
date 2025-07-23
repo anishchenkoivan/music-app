@@ -16,6 +16,7 @@ import java.util.UUID;
 public class TrackData {
     @Id
     private UUID id;
+    private String title;
     private long likesCount;
     private long playsCount;
     private int duration;

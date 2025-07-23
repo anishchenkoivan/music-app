@@ -1,12 +1,11 @@
 package com.musicapp.musicservice.controller;
 
 import com.musicapp.musicservice.dto.TrackDto;
+import com.musicapp.musicservice.dto.request.TrackDataModifyRequest;
+import com.musicapp.musicservice.dto.response.TrackDataUploadResponse;
 import com.musicapp.musicservice.service.TrackService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -21,7 +20,12 @@ public class TrackController {
     }
 
     @GetMapping("/{id}")
-    TrackDto getTrackById(@PathVariable("id") UUID id) {
+    public TrackDto getTrackById(@PathVariable("id") UUID id) {
         return trackService.getTrackViewById(id);
+    }
+
+    @PostMapping("/upload")
+    public TrackDataUploadResponse uploadTrackData(TrackDataModifyRequest request) {
+        return trackService.createTrackData(request);
     }
 }

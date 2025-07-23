@@ -31,5 +31,7 @@ public class Album {
     public void addTrack(TrackView track) {
         track.setAlbum(this);
         tracks.add(track);
+        length++;
+        duration += track.getTrackData().getDuration();
     }
 }

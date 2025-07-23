@@ -12,14 +12,16 @@ import java.util.UUID;
 @Service
 public class PlaylistService {
     private final PlaylistRepository playlistRepository;
+    private final PlaylistFactory playlistFactory;
 
     @Autowired
-    public PlaylistService(PlaylistRepository playlistRepository) {
+    public PlaylistService(PlaylistRepository playlistRepository, PlaylistFactory playlistFactory) {
         this.playlistRepository = playlistRepository;
+        this.playlistFactory = playlistFactory;
     }
 
     @Transactional(readOnly = true)
     public PlaylistDto getPlaylistById(UUID id) {
-        return PlaylistFactory.toPlaylistDto(playlistRepository.findById(id).orElseThrow());
+        return playlistFactory.toPlaylistDto(playlistRepository.findById(id).orElseThrow());
     }
 }
