@@ -1,5 +1,7 @@
 package com.musicapp.authservice.security;
 
+import com.musicapp.authservice.entity.Role;
+import com.musicapp.authservice.entity.User;
 import com.musicapp.authservice.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,12 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class AuthenticationFilter extends OncePerRequestFilter {
@@ -27,9 +31,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
-        UUID userId = validateTokenAndGetUserDetails(token);
-        if (token != null && userId != null) {
-            var auth = new UsernamePasswordAuthenticationToken(userId, null, null);
+        User user = validateTokenAndGetUserDetails(token);
+        if (token != null && user != null) {
+            Set<Role> roles = user.getRoles();
+
+            List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                    .toList();
+
+            var auth = new UsernamePasswordAuthenticationToken(user.getId(), null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
@@ -44,7 +54,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private UUID validateTokenAndGetUserDetails(String token) {
+    private User validateTokenAndGetUserDetails(String token) {
         try {
             return authService.validateToken(token);
         } catch(RuntimeException e) {

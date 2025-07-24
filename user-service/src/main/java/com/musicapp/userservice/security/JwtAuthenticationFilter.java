@@ -1,6 +1,7 @@
 package com.musicapp.userservice.security;
 
 import com.musicapp.userservice.dto.request.JwtValidateRequest;
+import com.musicapp.userservice.dto.response.TokenValidateResponse;
 import com.musicapp.userservice.gateway.AuthClient;
 import feign.FeignException;
 import jakarta.servlet.FilterChain;
@@ -29,9 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) throws ServletException, IOException {
         String token = extractToken(request);
-        UUID userId = validateTokenAndGetUserDetails(token);
-        if (token != null && userId != null) {
-            var auth = new UsernamePasswordAuthenticationToken(userId, null, null);
+        TokenValidateResponse details = validateTokenAndGetUserDetails(token);
+        if (token != null && details != null) {
+            var auth = new UsernamePasswordAuthenticationToken(details.id(), null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
@@ -46,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private UUID validateTokenAndGetUserDetails(String token) {
+    private TokenValidateResponse validateTokenAndGetUserDetails(String token) {
         try {
             return authClient.validateToken(new JwtValidateRequest(token));
         } catch(FeignException e) {

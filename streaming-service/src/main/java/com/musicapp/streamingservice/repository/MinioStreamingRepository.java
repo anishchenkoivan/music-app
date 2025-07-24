@@ -2,6 +2,7 @@ package com.musicapp.streamingservice.repository;
 
 import com.musicapp.streamingservice.config.MinioProps;
 import com.musicapp.streamingservice.exception.AudioStreamException;
+import com.musicapp.streamingservice.exception.AudioSaveException;
 import io.minio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,26 +38,18 @@ public class MinioStreamingRepository implements StreamingRepository {
     }
 
     @Override
-    public void save(MultipartFile file) {
-        try {
-            boolean bucketExists = minioClient.bucketExists(
-                    BucketExistsArgs.builder().bucket(props.bucket()).build()
-            );
-        } catch (Exception e) {
-            throw new AudioStreamException("Failed to create bucket", e);
-        }
-
+    public void save(MultipartFile file, String fileName) {
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(props.bucket())
-                            .object(file.getOriginalFilename())
+                            .object(fileName)
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build()
             );
         } catch (Exception e) {
-            throw new AudioStreamException("Failed to save audio file", e);
+            throw new AudioSaveException("Failed to save audio file", e);
         }
     }
 

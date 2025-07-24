@@ -8,6 +8,6 @@ import java.io.InputStream;
 @Repository
 public interface StreamingRepository {
     InputStream stream(String file, long start, long end);
-    void save(MultipartFile file);
+    void save(MultipartFile file, String fileName);
     long size(String file);
 }
