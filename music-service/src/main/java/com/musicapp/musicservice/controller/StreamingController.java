@@ -42,7 +42,6 @@ public class StreamingController {
                 .queryParam("token", streamingResponse.hmacToken())
                 .toUriString();
 
-        System.out.println(redirectUrl);
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirectUrl)).build();
     }
 }

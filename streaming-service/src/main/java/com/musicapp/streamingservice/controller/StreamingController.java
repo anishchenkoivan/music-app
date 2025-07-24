@@ -1,7 +1,7 @@
 package com.musicapp.streamingservice.controller;
 
 import com.musicapp.streamingservice.dto.AudioStreamingDto;
-import com.musicapp.streamingservice.gateway.KafkaProducer;
+import com.musicapp.streamingservice.security.StreamingTokenService;
 import com.musicapp.streamingservice.service.StreamingService;
 import com.musicapp.streamingservice.util.Range;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,22 +13,24 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/audio")
 public class StreamingController {
     private final StreamingService streamingService;
-    @Autowired
-    private KafkaProducer kafkaProducer;
+    private final StreamingTokenService streamingTokenService;
 
     @Autowired
-    public StreamingController(StreamingService streamingService) {
+    public StreamingController(StreamingService streamingService, StreamingTokenService streamingTokenService) {
         this.streamingService = streamingService;
+        this.streamingTokenService = streamingTokenService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StreamingResponseBody> streamAudio(@PathVariable String id, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<StreamingResponseBody> streamAudio(@PathVariable String id, @RequestParam("token") String token, @RequestHeader HttpHeaders headers) {
+        if (!streamingTokenService.validateToken(token, id)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         AudioStreamingDto dto = streamingService.stream(id, headers.getFirst(HttpHeaders.RANGE));
         Range range = dto.range();
         StreamingResponseBody body = dto.body();
@@ -50,10 +52,5 @@ public class StreamingController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void upload(@RequestParam("file") MultipartFile file) {
         streamingService.save(file);
-    }
-
-    @PostMapping("/kafka/{id}")
-    public void runKafka(@PathVariable UUID id) {
-        kafkaProducer.trackUploaded(id);
     }
 }
