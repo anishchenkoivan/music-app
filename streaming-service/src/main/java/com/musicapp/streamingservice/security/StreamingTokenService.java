@@ -14,7 +14,7 @@ public class StreamingTokenService {
     @Value("${hmac.secret}")
     private String secretKey;
 
-    public boolean validateToken(String token, String songId) {
+    public boolean validateStreamingToken(String token, String songId) {
         String[] separatedToken = token.split("\\.");
         if (separatedToken.length != 2) {
             return false;

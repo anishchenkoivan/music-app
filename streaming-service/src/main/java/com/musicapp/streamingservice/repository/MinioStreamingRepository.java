@@ -38,12 +38,12 @@ public class MinioStreamingRepository implements StreamingRepository {
     }
 
     @Override
-    public void save(MultipartFile file) {
+    public void save(MultipartFile file, String fileName) {
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(props.bucket())
-                            .object(file.getOriginalFilename())
+                            .object(fileName)
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build()

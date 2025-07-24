@@ -39,7 +39,7 @@ public class StreamingService {
         return new AudioStreamingDto(range, body);
     }
 
-    public void save(MultipartFile file) {
-        streamingRepository.save(file);
+    public void save(MultipartFile file, String id) {
+        streamingRepository.save(file, id + ".mp3");
     }
 }

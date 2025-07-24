@@ -24,7 +24,7 @@ public class JwtService {
     public String generateUploadToken(UUID trackDataId) {
         return Jwts.builder()
                 .subject(trackDataId.toString())
-                .claim("actions", TrackActions.UPLOAD)
+                .claim("action", TrackActions.UPLOAD)
                 .signWith(secretKey)
                 .compact();
     }
