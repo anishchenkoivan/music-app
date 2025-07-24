@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class Album {
     private Artist artist;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "album",  cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "album_index")
-    private List<TrackView> tracks;
+    private List<TrackView> tracks = new ArrayList<>();
     private int duration;
     private int length;
     private LocalDate releaseDate;

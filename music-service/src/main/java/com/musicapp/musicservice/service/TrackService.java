@@ -46,7 +46,12 @@ public class TrackService {
 
     @Transactional(readOnly = true)
     public TrackDto getTrackViewById(UUID id) {
-        return trackFactory.toTrackDto(trackViewRepository.findById(id).orElseThrow());
+        return trackFactory.toTrackDto(getTrackViewEntityById(id));
+    }
+
+    @Transactional(readOnly = true)
+    public TrackView getTrackViewEntityById(UUID id) {
+        return trackViewRepository.findById(id).orElseThrow();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

@@ -1,10 +1,11 @@
 package com.musicapp.musicservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class Playlist {
     @Id
     private UUID id;
+    private UUID userId;
     private String title;
     private int length;
     private int duration;
@@ -28,9 +30,23 @@ public class Playlist {
             inverseJoinColumns = @JoinColumn(name = "track_id")
     )
     @OrderColumn(name = "playlist_index")
-    private List<TrackView> tracks;
+    private List<TrackView> tracks = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "special_type")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private PlaylistSpecialType specialType;
 
     public void addTrack(TrackView track) {
         tracks.add(track);
+        length++;
+        duration += track.getTrackData().getDuration();
+    }
+
+    public void removeTrack(TrackView track) {
+        if (tracks.remove(track)) {
+            length--;
+            duration -= track.getTrackData().getDuration();
+        }
     }
 }

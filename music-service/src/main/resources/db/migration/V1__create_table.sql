@@ -1,3 +1,11 @@
+DO $$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'special_playlist_type') THEN
+            CREATE TYPE special_playlist_type AS ENUM ('HISTORY', 'FAVORITE');
+        END IF;
+    END
+$$;
+
 CREATE TABLE track_data (
     id UUID PRIMARY KEY,
     title TEXT,
@@ -42,7 +50,8 @@ CREATE TABLE playlists (
     length INT,
     duration  INT,
     is_public BOOLEAN DEFAULT TRUE,
-    is_special BOOLEAN DEFAULT FALSE
+    is_special BOOLEAN DEFAULT FALSE,
+    special_type special_playlist_type DEFAULT NULL
 );
 
 CREATE TABLE playlist_tracks (
