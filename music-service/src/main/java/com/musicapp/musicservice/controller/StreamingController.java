@@ -1,7 +1,7 @@
 package com.musicapp.musicservice.controller;
 
 import com.musicapp.musicservice.dto.response.StreamingResponse;
-import com.musicapp.musicservice.service.ListenService;
+import com.musicapp.musicservice.service.ActionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/stream")
 public class StreamingController {
-    private final ListenService listenService;
+    private final ActionService actionService;
     @Value("${streaming.service.base.url}")
     private String streamingServiceUrl;
 
-    public StreamingController(ListenService listenService) {
-        this.listenService = listenService;
+    public StreamingController(ActionService actionService) {
+        this.actionService = actionService;
     }
 
     @GetMapping("/{id}")
@@ -34,7 +34,7 @@ public class StreamingController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UUID userId = UUID.fromString(authentication.getPrincipal().toString());
 
-        StreamingResponse streamingResponse = listenService.listen(id, userId);
+        StreamingResponse streamingResponse = actionService.listen(id, userId);
 
         String redirectUrl = UriComponentsBuilder
                 .fromUriString(streamingServiceUrl)

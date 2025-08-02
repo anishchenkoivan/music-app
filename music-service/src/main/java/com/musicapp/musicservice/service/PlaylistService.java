@@ -68,19 +68,19 @@ public class PlaylistService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void addToPlaylist(UUID playlistId, UUID trackId) {
+    public boolean addToPlaylist(UUID playlistId, UUID trackId) {
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
-        playlist.addTrack(trackService.getTrackViewEntityById(trackId));
+        return playlist.addTrack(trackService.getTrackViewEntityById(trackId));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeFromPlaylist(UUID playlistId, UUID trackId) {
+    public boolean removeFromPlaylist(UUID playlistId, UUID trackId) {
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
-        playlist.removeTrack(trackService.getTrackViewEntityById(trackId));
+        return playlist.removeTrack(trackService.getTrackViewEntityById(trackId));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Playlist getUserHistory(UUID userId) {
+    public Playlist getUserHistoryEntity(UUID userId) {
         Optional<Playlist> historyPlaylist = playlistRepository.findByUserIdAndSpecialType(userId, PlaylistSpecialType.HISTORY);
         if (historyPlaylist.isPresent()) {
             return historyPlaylist.get();
@@ -88,5 +88,26 @@ public class PlaylistService {
         Playlist newHistoryPlaylist = playlistFactory.specialPlaylist(userId, PlaylistSpecialType.HISTORY);
         playlistRepository.save(newHistoryPlaylist);
         return newHistoryPlaylist;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Playlist getUserFavoritesEntity(UUID userId) {
+        Optional<Playlist> likesPlaylist = playlistRepository.findByUserIdAndSpecialType(userId, PlaylistSpecialType.FAVORITE);
+        if (likesPlaylist.isPresent()) {
+            return likesPlaylist.get();
+        }
+        Playlist newFavoritesPlaylist = playlistFactory.specialPlaylist(userId, PlaylistSpecialType.FAVORITE);
+        playlistRepository.save(newFavoritesPlaylist);
+        return newFavoritesPlaylist;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public PlaylistDto getUserFavorites(UUID userId) {
+        return playlistFactory.toPlaylistDto(getUserFavoritesEntity(userId));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public PlaylistDto getUserHistory(UUID userId) {
+        return playlistFactory.toPlaylistDto(getUserHistoryEntity(userId));
     }
 }

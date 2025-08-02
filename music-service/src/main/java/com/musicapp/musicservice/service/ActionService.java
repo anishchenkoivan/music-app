@@ -11,29 +11,40 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
-public class ListenService {
+public class ActionService {
     private final StreamingTokenService streamingTokenService;
     private final PlaylistService playlistService;
+    private final TrackService trackService;
 
     @Autowired
-    public ListenService(StreamingTokenService streamingTokenService, PlaylistService playlistService) {
+    public ActionService(StreamingTokenService streamingTokenService, PlaylistService playlistService, TrackService trackService) {
         this.streamingTokenService = streamingTokenService;
         this.playlistService = playlistService;
+        this.trackService = trackService;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public StreamingResponse listen(UUID trackId, UUID userId) {
         String token = streamingTokenService.generateToken(trackId);
-        Playlist userHistory = playlistService.getUserHistory(userId);
+        Playlist userHistory = playlistService.getUserHistoryEntity(userId);
         playlistService.addToPlaylist(userHistory.getId(), trackId);
+        trackService.incrementPlayCount(trackId);
         return new StreamingResponse(token);
     }
 
-    public void addLike() {
-
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void addFavorite(UUID trackId, UUID userId) {
+        Playlist userFavorites = playlistService.getUserFavoritesEntity(userId);
+        if (playlistService.addToPlaylist(userFavorites.getId(), trackId)) {
+            trackService.changeTrackLikesCount(trackId, true);
+        }
     }
 
-    public void removeLike() {
-
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void removeFavorite(UUID trackId, UUID userId) {
+        Playlist userFavorites = playlistService.getUserFavoritesEntity(userId);
+        if (playlistService.removeFromPlaylist(userFavorites.getId(), trackId)) {
+            trackService.changeTrackLikesCount(trackId, false);
+        }
     }
 }

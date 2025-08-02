@@ -37,16 +37,22 @@ public class Playlist {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private PlaylistSpecialType specialType;
 
-    public void addTrack(TrackView track) {
+    public boolean addTrack(TrackView track) {
+        if (tracks.contains(track)) {
+            return false;
+        }
         tracks.add(track);
         length++;
         duration += track.getTrackData().getDuration();
+        return true;
     }
 
-    public void removeTrack(TrackView track) {
-        if (tracks.remove(track)) {
+    public boolean removeTrack(TrackView track) {
+        boolean removed = tracks.remove(track);
+        if (removed) {
             length--;
             duration -= track.getTrackData().getDuration();
         }
+        return removed;
     }
 }
