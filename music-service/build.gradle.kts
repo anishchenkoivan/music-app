@@ -24,6 +24,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 	implementation("org.flywaydb:flyway-database-postgresql")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 	implementation("io.jsonwebtoken:jjwt:0.12.6")
