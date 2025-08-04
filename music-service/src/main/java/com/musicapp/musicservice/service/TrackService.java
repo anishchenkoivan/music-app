@@ -107,4 +107,17 @@ public class TrackService {
         trackData.setValid(true);
         trackDataRepository.save(trackData);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void changeTrackLikesCount(UUID id, boolean increment) {
+        TrackData trackData = trackDataRepository.findByIdForUpdate(id).orElseThrow();
+        int difference = increment ? 1 : -1;
+        trackData.setLikesCount(trackData.getLikesCount() + difference);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void incrementPlayCount(UUID id) {
+        TrackData trackData = trackDataRepository.findByIdForUpdate(id).orElseThrow();
+        trackData.setLikesCount(trackData.getLikesCount() + 1);
+    }
 }
