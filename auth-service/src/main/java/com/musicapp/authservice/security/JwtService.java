@@ -55,7 +55,7 @@ public class JwtService {
     }
 
     private boolean rolesMatch(String token, Set<Role> rolesFromUser) {
-        var rawRoles = getClaims(token, claims -> claims.get("roles", Set.class));
+        var rawRoles = getClaims(token, claims -> claims.get("roles"));
         if (rawRoles == null) {
             return true;
         }
