@@ -48,3 +48,15 @@ dependencyManagement {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+val mockitoAgent = configurations.create("mockitoAgent")
+
+dependencies {
+    mockitoAgent("org.mockito:mockito-core") { isTransitive = false }
+}
+
+tasks {
+    test {
+        jvmArgs("-javaagent:${mockitoAgent.asPath}")
+    }
+}
