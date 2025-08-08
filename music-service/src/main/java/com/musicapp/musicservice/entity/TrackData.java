@@ -16,12 +16,14 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrackData {
-    @Id
     @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue
     private UUID id;
     private String title;
     private long likesCount;
     private long playsCount;
+    // Duration in seconds
     private int duration;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -30,6 +32,7 @@ public class TrackData {
             inverseJoinColumns = @JoinColumn(name = "artist_id")
     )
     private Set<Artist> artists;
+    // Underlying source file exists
     private boolean isValid;
 
     @Override

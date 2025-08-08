@@ -1,4 +1,6 @@
 package com.musicapp.musicservice.dto.response;
 
-public record TrackDataUploadResponse(String uploadToken) {
+import java.util.UUID;
+
+public record TrackDataUploadResponse(UUID id, String uploadToken) {
 }
