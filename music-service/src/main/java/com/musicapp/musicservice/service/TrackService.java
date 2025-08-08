@@ -10,6 +10,7 @@ import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackData;
 import com.musicapp.musicservice.entity.TrackView;
 import com.musicapp.musicservice.exception.CopyrightException;
+import com.musicapp.musicservice.gateway.event.TrackDataUploadedEvent;
 import com.musicapp.musicservice.repository.AlbumRepository;
 import com.musicapp.musicservice.repository.TrackDataRepository;
 import com.musicapp.musicservice.repository.TrackViewRepository;
@@ -102,9 +103,10 @@ public class TrackService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void trackDataUploaded(UUID id) {
-        TrackData trackData = getTrackDataEntityById(id);
+    public void trackDataUploaded(TrackDataUploadedEvent event) {
+        TrackData trackData = getTrackDataEntityById(event.trackDataId());
         trackData.setValid(true);
+        trackData.setDuration(event.duration());
         trackDataRepository.save(trackData);
     }
 

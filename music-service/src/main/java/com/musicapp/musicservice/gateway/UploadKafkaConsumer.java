@@ -10,12 +10,12 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KafkaConsumer {
+public class UploadKafkaConsumer {
     private final ObjectMapper objectMapper;
     private final TrackService trackService;
 
     @Autowired
-    public KafkaConsumer(ObjectMapper objectMapper, TrackService trackService) {
+    public UploadKafkaConsumer(ObjectMapper objectMapper, TrackService trackService) {
         this.objectMapper = objectMapper;
         this.trackService = trackService;
     }
@@ -24,7 +24,7 @@ public class KafkaConsumer {
     public void onTrackDataUploaded(String event) {
         try {
             TrackDataUploadedEvent trackDataUploadedEvent = objectMapper.readValue(event, TrackDataUploadedEvent.class);
-            trackService.trackDataUploaded(trackDataUploadedEvent.trackDataId());
+            trackService.trackDataUploaded(trackDataUploadedEvent);
         } catch (JsonProcessingException e) {
             throw new KafkaConsumeException(e.getMessage(), e);
         }

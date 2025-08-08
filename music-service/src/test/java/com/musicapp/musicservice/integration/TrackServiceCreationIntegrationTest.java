@@ -38,8 +38,8 @@ public class TrackServiceCreationIntegrationTest extends BaseIntegrationTest {
                 "Title",
                 Set.of()
         ));
-
         UUID trackId = response.id();
+        int duration = 10;
 
         TrackData trackData = trackService.getTrackDataEntityById(trackId);
         assertEquals("Title", trackData.getTitle());
@@ -47,11 +47,12 @@ public class TrackServiceCreationIntegrationTest extends BaseIntegrationTest {
         assertEquals(0, trackData.getDuration());
         assertFalse(trackData.isValid());
 
-        kafkaProducer.produce(trackUploadedTopic, new TrackDataUploadedEvent(trackId, 10));
+        kafkaProducer.produce(trackUploadedTopic, new TrackDataUploadedEvent(trackId, duration));
 
         await().atMost(10, java.util.concurrent.TimeUnit.SECONDS).untilAsserted(() -> {
             TrackData newTrackData = trackService.getTrackDataEntityById(trackId);
             assertTrue(newTrackData.isValid());
+            assertEquals(duration, newTrackData.getDuration());
         });
     }
 }
