@@ -16,8 +16,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrackData {
-    @Id
     @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue
     private UUID id;
     private String title;
     private long likesCount;

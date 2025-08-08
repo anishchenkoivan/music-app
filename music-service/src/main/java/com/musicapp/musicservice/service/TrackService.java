@@ -59,7 +59,7 @@ public class TrackService {
         Set<Artist> artists = request.artistIds().stream().map(artistService::getArtistEntityById).collect(Collectors.toSet());
         TrackData trackData = trackFactory.trackData(request.title(), artists);
         trackDataRepository.save(trackData);
-        return  new TrackDataUploadResponse(jwtService.generateUploadToken(trackData.getId()));
+        return  new TrackDataUploadResponse(trackData.getId(), jwtService.generateUploadToken(trackData.getId()));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

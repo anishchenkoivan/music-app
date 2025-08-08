@@ -11,7 +11,7 @@ CREATE TABLE track_data (
     title TEXT,
     likes_count BIGINT NOT NULL CHECK (likes_count >= 0),
     plays_count BIGINT NOT NULL CHECK (plays_count >= 0),
-    duration INT NOT NULL CHECK (duration > 0),
+    duration INT NOT NULL CHECK (duration >= 0),
     is_valid BOOLEAN DEFAULT FALSE
 );
 
