@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class KafkaProducer {
+public class UploadKafkaProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final String trackUploadedTopic;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public KafkaProducer(
+    public UploadKafkaProducer(
             KafkaTemplate<String, String> kafkaTemplate,
             @Value("${track-uploaded-topic}")
             String trackUploadedTopic,
@@ -29,10 +29,10 @@ public class KafkaProducer {
         this.objectMapper = objectMapper;
     }
 
-    public void trackUploaded(UUID trackId) {
+    public void trackUploaded(TrackUploadedEvent event) {
         String json = null;
         try {
-            json = objectMapper.writeValueAsString(new TrackUploadedEvent(trackId));
+            json = objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
             throw new KafkaProduceException(e.getMessage(), e);
         }

@@ -23,6 +23,7 @@ public class TrackData {
     private String title;
     private long likesCount;
     private long playsCount;
+    // Duration in seconds
     private int duration;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -31,6 +32,7 @@ public class TrackData {
             inverseJoinColumns = @JoinColumn(name = "artist_id")
     )
     private Set<Artist> artists;
+    // Underlying source file exists
     private boolean isValid;
 
     @Override

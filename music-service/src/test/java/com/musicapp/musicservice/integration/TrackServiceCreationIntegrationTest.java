@@ -47,7 +47,7 @@ public class TrackServiceCreationIntegrationTest extends BaseIntegrationTest {
         assertEquals(0, trackData.getDuration());
         assertFalse(trackData.isValid());
 
-        kafkaProducer.produce(trackUploadedTopic, new TrackDataUploadedEvent(trackId));
+        kafkaProducer.produce(trackUploadedTopic, new TrackDataUploadedEvent(trackId, 10));
 
         await().atMost(10, java.util.concurrent.TimeUnit.SECONDS).untilAsserted(() -> {
             TrackData newTrackData = trackService.getTrackDataEntityById(trackId);
