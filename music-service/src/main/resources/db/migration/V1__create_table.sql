@@ -1,7 +1,7 @@
 DO $$
     BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'special_playlist_type') THEN
-            CREATE TYPE special_playlist_type AS ENUM ('HISTORY', 'FAVORITE');
+            CREATE TYPE special_playlist_type AS ENUM ('HISTORY');
         END IF;
     END
 $$;

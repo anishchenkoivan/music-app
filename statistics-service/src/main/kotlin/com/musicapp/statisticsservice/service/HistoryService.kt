@@ -1,19 +1,19 @@
 package com.musicapp.statisticsservice.service
 
-import com.musicapp.statisticsservice.dto.request.HistoryEntryRequest
 import com.musicapp.statisticsservice.dto.response.SimplifiedHistoryEntryResponse
 import com.musicapp.statisticsservice.dto.response.UserHistoryResponse
 import com.musicapp.statisticsservice.entity.HistoryEntry
+import com.musicapp.statisticsservice.gateway.event.HistoryEntryAddEvent
 import com.musicapp.statisticsservice.repository.HistoryRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.UUID
 
 @Service
-class HistoryService(val historyRepository: HistoryRepository) {
-    fun addEntry(historyEntryRequest: HistoryEntryRequest) {
-        val historyEntry = with (historyEntryRequest) {
-            HistoryEntry(userId, trackViewId, Instant.now())
+class HistoryService(private val historyRepository: HistoryRepository) {
+    fun addEntry(event: HistoryEntryAddEvent) {
+        val historyEntry = with (event) {
+            HistoryEntry(userId, trackId, Instant.now())
         }
         historyRepository.addEntry(historyEntry)
     }

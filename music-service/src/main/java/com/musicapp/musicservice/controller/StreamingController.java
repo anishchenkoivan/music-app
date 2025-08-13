@@ -1,6 +1,6 @@
 package com.musicapp.musicservice.controller;
 
-import com.musicapp.musicservice.dto.response.StreamingResponse;
+import com.musicapp.musicservice.dto.response.streaming.StreamingResponse;
 import com.musicapp.musicservice.service.ActionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

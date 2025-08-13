@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.5.3"
 	id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm") version "2.2.0"
 }
 
 group = "com.musicapp"
@@ -39,6 +40,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.21.3")
     testImplementation("org.testcontainers:kafka:1.21.3")
     testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    implementation(kotlin("stdlib-jdk8"))
 
 }
 

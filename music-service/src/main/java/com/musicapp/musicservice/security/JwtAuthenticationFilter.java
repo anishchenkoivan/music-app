@@ -1,7 +1,7 @@
 package com.musicapp.musicservice.security;
 
 import com.musicapp.musicservice.dto.request.JwtValidateRequest;
-import com.musicapp.musicservice.dto.response.TokenValidateResponse;
+import com.musicapp.musicservice.dto.response.auth.TokenValidateResponse;
 import com.musicapp.musicservice.gateway.AuthClient;
 import feign.FeignException;
 import jakarta.servlet.FilterChain;

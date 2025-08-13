@@ -3,8 +3,8 @@ package com.musicapp.musicservice.service;
 import com.musicapp.musicservice.dto.TrackDto;
 import com.musicapp.musicservice.dto.request.TrackDataModifyRequest;
 import com.musicapp.musicservice.dto.request.TrackViewModifyRequest;
-import com.musicapp.musicservice.dto.response.ArtistTracksResponse;
-import com.musicapp.musicservice.dto.response.TrackDataUploadResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistTracksResponse;
+import com.musicapp.musicservice.dto.response.streaming.TrackDataUploadResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackData;
@@ -121,5 +121,15 @@ public class TrackService {
     public void incrementPlayCount(UUID id) {
         TrackData trackData = trackDataRepository.findByIdForUpdate(id).orElseThrow();
         trackData.setLikesCount(trackData.getLikesCount() + 1);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TrackView> getTrackViewEntitiesById(List<UUID> ids) {
+        return trackViewRepository.findAllById(ids);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TrackDto> getTrackTrackViewsById(List<UUID> ids) {
+        return trackViewRepository.findAllById(ids).stream().map(trackFactory::toTrackDto).toList();
     }
 }

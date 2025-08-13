@@ -22,7 +22,7 @@ class ClickHouseHistoryRepository(val jdbcTemplate: JdbcTemplate): HistoryReposi
     }
 
     override fun getUserHistory(userId: UUID, limit: Int): List<HistoryEntry> {
-        val sql = "SELECT * FROM history WHERE user_id = ? ORDER BY timestamp LIMIT ?"
+        val sql = "SELECT * FROM history WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?"
 
         val result = jdbcTemplate.query(sql, rowMapper, userId, limit)
         return result

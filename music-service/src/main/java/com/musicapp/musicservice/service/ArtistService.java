@@ -2,7 +2,7 @@ package com.musicapp.musicservice.service;
 
 import com.musicapp.musicservice.dto.ArtistDto;
 import com.musicapp.musicservice.dto.request.ArtistModifyRequest;
-import com.musicapp.musicservice.dto.response.ArtistCreateResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistCreateResponse;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.repository.ArtistRepository;
 import com.musicapp.musicservice.util.ArtistFactory;

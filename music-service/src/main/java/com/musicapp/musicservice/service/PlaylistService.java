@@ -2,7 +2,7 @@ package com.musicapp.musicservice.service;
 
 import com.musicapp.musicservice.dto.PlaylistDto;
 import com.musicapp.musicservice.dto.request.PlaylistModifyRequest;
-import com.musicapp.musicservice.dto.response.PlaylistCreateResponse;
+import com.musicapp.musicservice.dto.response.playlist.PlaylistCreateResponse;
 import com.musicapp.musicservice.entity.Playlist;
 import com.musicapp.musicservice.entity.PlaylistSpecialType;
 import com.musicapp.musicservice.entity.TrackView;
@@ -46,8 +46,7 @@ public class PlaylistService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public PlaylistCreateResponse createPlaylist(PlaylistModifyRequest playlistModifyRequest, UUID userId) {
-        List<TrackView> tracks = playlistModifyRequest.tracks()
-                .stream().map(trackService::getTrackViewEntityById).toList();
+        List<TrackView> tracks = trackService.getTrackViewEntitiesById(playlistModifyRequest.tracks());
         Playlist playlist = playlistFactory.playlist(
                 playlistModifyRequest.title(),
                 userId,
@@ -61,8 +60,7 @@ public class PlaylistService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void updatePlaylist(UUID playlistId, PlaylistModifyRequest playlistModifyRequest) {
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
-        List<TrackView> tracks = playlistModifyRequest.tracks()
-                .stream().map(trackService::getTrackViewEntityById).toList();
+        List<TrackView> tracks = trackService.getTrackViewEntitiesById(playlistModifyRequest.tracks());
         playlist.setTitle(playlistModifyRequest.title());
         playlistFactory.applyTracks(playlist, tracks);
     }
@@ -80,17 +78,6 @@ public class PlaylistService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Playlist getUserHistoryEntity(UUID userId) {
-        Optional<Playlist> historyPlaylist = playlistRepository.findByUserIdAndSpecialType(userId, PlaylistSpecialType.HISTORY);
-        if (historyPlaylist.isPresent()) {
-            return historyPlaylist.get();
-        }
-        Playlist newHistoryPlaylist = playlistFactory.specialPlaylist(userId, PlaylistSpecialType.HISTORY);
-        playlistRepository.save(newHistoryPlaylist);
-        return newHistoryPlaylist;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
     public Playlist getUserFavoritesEntity(UUID userId) {
         Optional<Playlist> likesPlaylist = playlistRepository.findByUserIdAndSpecialType(userId, PlaylistSpecialType.FAVORITE);
         if (likesPlaylist.isPresent()) {
@@ -104,10 +91,5 @@ public class PlaylistService {
     @Transactional(propagation = Propagation.REQUIRED)
     public PlaylistDto getUserFavorites(UUID userId) {
         return playlistFactory.toPlaylistDto(getUserFavoritesEntity(userId));
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public PlaylistDto getUserHistory(UUID userId) {
-        return playlistFactory.toPlaylistDto(getUserHistoryEntity(userId));
     }
 }
