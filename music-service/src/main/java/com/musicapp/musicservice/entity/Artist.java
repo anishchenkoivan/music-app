@@ -18,6 +18,7 @@ import java.util.UUID;
 public class Artist {
     @Id
     @EqualsAndHashCode.Include
+    @GeneratedValue
     private UUID id;
     private String name;
     private UUID userId;

@@ -1,8 +1,8 @@
 package com.musicapp.musicservice.controller;
 
 import com.musicapp.musicservice.dto.ArtistDto;
-import com.musicapp.musicservice.dto.response.ArtistAlbumsResponse;
-import com.musicapp.musicservice.dto.response.ArtistTracksResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistAlbumsResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistTracksResponse;
 import com.musicapp.musicservice.service.AlbumService;
 import com.musicapp.musicservice.service.ArtistService;
 import com.musicapp.musicservice.service.TrackService;

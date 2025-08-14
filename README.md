@@ -5,8 +5,9 @@ A backend for a music streaming and sharing app.
 - **Audio streaming**
 - **User uploads**
 - **Personal library management: playlists, history, favorites**
-- **JWT authentiaction and signed URLs for streaming**
+- **JWT authentication and signed URLs for streaming**
 - **Microservice architecture with Spring Cloud**
+- **ClickHouse for play history**
 
 ## To-Do:
 - Search system

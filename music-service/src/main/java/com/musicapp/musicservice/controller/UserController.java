@@ -1,14 +1,13 @@
 package com.musicapp.musicservice.controller;
 
 import com.musicapp.musicservice.dto.PlaylistDto;
-import com.musicapp.musicservice.dto.response.PlaylistCollectionResponse;
+import com.musicapp.musicservice.dto.response.playlist.PlaylistCollectionResponse;
+import com.musicapp.musicservice.dto.response.statistics.UserHistoryResponse;
 import com.musicapp.musicservice.service.PlaylistService;
+import com.musicapp.musicservice.service.StatisticsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -17,9 +16,11 @@ import java.util.UUID;
 public class UserController {
 
     private final PlaylistService playlistService;
+    private final StatisticsService statisticsService;
 
-    public UserController(PlaylistService playlistService) {
+    public UserController(PlaylistService playlistService, StatisticsService statisticsService) {
         this.playlistService = playlistService;
+        this.statisticsService = statisticsService;
     }
 
     private UUID getAuthenticatedUserId() {
@@ -28,9 +29,9 @@ public class UserController {
     }
 
     @GetMapping("/history")
-    public PlaylistDto getUserHistory() {
+    public UserHistoryResponse getUserHistory(@RequestParam Integer limit) {
         UUID authenticatedUserId = getAuthenticatedUserId();
-        return playlistService.getUserHistory(authenticatedUserId);
+        return statisticsService.getUserHistory(authenticatedUserId, limit);
     }
 
     @GetMapping("/favorites")

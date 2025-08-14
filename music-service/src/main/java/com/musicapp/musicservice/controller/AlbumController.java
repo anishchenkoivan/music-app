@@ -3,8 +3,8 @@ package com.musicapp.musicservice.controller;
 import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
 import com.musicapp.musicservice.dto.request.AlbumGeneralCreateRequest;
-import com.musicapp.musicservice.dto.response.AlbumCreateResponse;
-import com.musicapp.musicservice.dto.response.AlbumsSearchResponse;
+import com.musicapp.musicservice.dto.response.album.AlbumCreateResponse;
+import com.musicapp.musicservice.dto.response.album.AlbumsSearchResponse;
 import com.musicapp.musicservice.service.AlbumService;
 import com.musicapp.musicservice.service.ArtistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class AlbumController {
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
-    AlbumCreateResponse createAlbum(@RequestBody AlbumGeneralCreateRequest request) {
+    AlbumDto createAlbum(@RequestBody AlbumGeneralCreateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return albumService.createAlbum(new AlbumCreateRequest(
                 artistService.getArtistForUser(UUID.fromString(authentication.getPrincipal().toString())).id(),

@@ -1,7 +1,7 @@
 package com.musicapp.musicservice.integration;
 
 import com.musicapp.musicservice.dto.request.TrackDataModifyRequest;
-import com.musicapp.musicservice.dto.response.TrackDataUploadResponse;
+import com.musicapp.musicservice.dto.response.streaming.TrackDataUploadResponse;
 import com.musicapp.musicservice.entity.TrackData;
 import com.musicapp.musicservice.gateway.event.TrackDataUploadedEvent;
 import com.musicapp.musicservice.integration.stabs.KafkaTestProducer;

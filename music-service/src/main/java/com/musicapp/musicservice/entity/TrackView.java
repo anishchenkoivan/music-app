@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TrackView {
     @Id
+    @GeneratedValue
     private UUID id;
     private String title;
     @ManyToOne

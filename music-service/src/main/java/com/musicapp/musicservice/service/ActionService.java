@@ -1,6 +1,6 @@
 package com.musicapp.musicservice.service;
 
-import com.musicapp.musicservice.dto.response.StreamingResponse;
+import com.musicapp.musicservice.dto.response.streaming.StreamingResponse;
 import com.musicapp.musicservice.entity.Playlist;
 import com.musicapp.musicservice.security.StreamingTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +15,20 @@ public class ActionService {
     private final StreamingTokenService streamingTokenService;
     private final PlaylistService playlistService;
     private final TrackService trackService;
+    private final StatisticsService statisticsService;
 
     @Autowired
-    public ActionService(StreamingTokenService streamingTokenService, PlaylistService playlistService, TrackService trackService) {
+    public ActionService(StreamingTokenService streamingTokenService, PlaylistService playlistService, TrackService trackService, StatisticsService statisticsService) {
         this.streamingTokenService = streamingTokenService;
         this.playlistService = playlistService;
         this.trackService = trackService;
+        this.statisticsService = statisticsService;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public StreamingResponse listen(UUID trackId, UUID userId) {
         String token = streamingTokenService.generateToken(trackId);
-        Playlist userHistory = playlistService.getUserHistoryEntity(userId);
-        playlistService.addToPlaylist(userHistory.getId(), trackId);
+        statisticsService.addToHistory(userId, trackId);
         trackService.incrementPlayCount(trackId);
         return new StreamingResponse(token);
     }

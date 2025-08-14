@@ -3,7 +3,7 @@ package com.musicapp.musicservice.controller;
 import com.musicapp.musicservice.dto.TrackDto;
 import com.musicapp.musicservice.dto.request.TrackDataModifyRequest;
 import com.musicapp.musicservice.dto.request.TrackViewModifyRequest;
-import com.musicapp.musicservice.dto.response.TrackDataUploadResponse;
+import com.musicapp.musicservice.dto.response.streaming.TrackDataUploadResponse;
 import com.musicapp.musicservice.service.ActionService;
 import com.musicapp.musicservice.service.ArtistService;
 import com.musicapp.musicservice.service.TrackService;

@@ -1,7 +1,7 @@
 DO $$
     BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'special_playlist_type') THEN
-            CREATE TYPE special_playlist_type AS ENUM ('HISTORY', 'FAVORITE');
+            CREATE TYPE special_playlist_type AS ENUM ('HISTORY');
         END IF;
     END
 $$;
@@ -39,7 +39,7 @@ CREATE TABLE track_views (
 );
 
 CREATE TABLE track_artists (
-    track_id UUID REFERENCES track_views(id) ON DELETE CASCADE,
+    track_id UUID REFERENCES track_data(id) ON DELETE CASCADE,
     artist_id UUID REFERENCES artists(id)
 );
 

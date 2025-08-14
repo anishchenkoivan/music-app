@@ -1,4 +1,4 @@
-package com.musicapp.musicservice.dto.response;
+package com.musicapp.musicservice.dto.response.streaming;
 
 import java.util.UUID;
 

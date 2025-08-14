@@ -3,8 +3,8 @@ package com.musicapp.musicservice.service;
 import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
 import com.musicapp.musicservice.dto.request.TrackViewCreateRequest;
-import com.musicapp.musicservice.dto.response.AlbumCreateResponse;
-import com.musicapp.musicservice.dto.response.ArtistAlbumsResponse;
+import com.musicapp.musicservice.dto.response.album.AlbumCreateResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistAlbumsResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackView;
@@ -48,7 +48,7 @@ public class AlbumService {
     }
 
     @Transactional
-    public AlbumCreateResponse createAlbum(AlbumCreateRequest albumCreateRequest) {
+    public AlbumDto createAlbum(AlbumCreateRequest albumCreateRequest) {
         List<TrackView> tracks = albumCreateRequest.generalData().tracks().stream()
                 .map((TrackViewCreateRequest trackViewData) -> trackFactory.trackView(
                         trackViewData.title(),
@@ -65,7 +65,7 @@ public class AlbumService {
             album.addTrack(trackView);
         }
         albumRepository.save(album);
-        return new AlbumCreateResponse(album.getId());
+        return albumFactory.toAlbumDto(album);
     }
 
     @Transactional(readOnly = true)

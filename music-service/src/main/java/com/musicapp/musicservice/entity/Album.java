@@ -20,6 +20,7 @@ import java.util.UUID;
 public class Album {
     @Id
     @EqualsAndHashCode.Include
+    @GeneratedValue
     private UUID id;
     private String title;
     @ManyToOne
