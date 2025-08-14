@@ -35,7 +35,7 @@ public class AlbumController {
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
-    AlbumCreateResponse createAlbum(@RequestBody AlbumGeneralCreateRequest request) {
+    AlbumDto createAlbum(@RequestBody AlbumGeneralCreateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return albumService.createAlbum(new AlbumCreateRequest(
                 artistService.getArtistForUser(UUID.fromString(authentication.getPrincipal().toString())).id(),

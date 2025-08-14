@@ -39,7 +39,7 @@ CREATE TABLE track_views (
 );
 
 CREATE TABLE track_artists (
-    track_id UUID REFERENCES track_views(id) ON DELETE CASCADE,
+    track_id UUID REFERENCES track_data(id) ON DELETE CASCADE,
     artist_id UUID REFERENCES artists(id)
 );
 

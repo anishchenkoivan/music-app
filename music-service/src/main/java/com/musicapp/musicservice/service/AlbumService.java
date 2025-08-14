@@ -48,7 +48,7 @@ public class AlbumService {
     }
 
     @Transactional
-    public AlbumCreateResponse createAlbum(AlbumCreateRequest albumCreateRequest) {
+    public AlbumDto createAlbum(AlbumCreateRequest albumCreateRequest) {
         List<TrackView> tracks = albumCreateRequest.generalData().tracks().stream()
                 .map((TrackViewCreateRequest trackViewData) -> trackFactory.trackView(
                         trackViewData.title(),
@@ -65,7 +65,7 @@ public class AlbumService {
             album.addTrack(trackView);
         }
         albumRepository.save(album);
-        return new AlbumCreateResponse(album.getId());
+        return albumFactory.toAlbumDto(album);
     }
 
     @Transactional(readOnly = true)

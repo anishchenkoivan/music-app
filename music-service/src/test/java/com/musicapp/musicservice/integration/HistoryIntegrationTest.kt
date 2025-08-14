@@ -1,0 +1,86 @@
+package com.musicapp.musicservice.integration
+
+import com.musicapp.musicservice.dto.request.AlbumCreateRequest
+import com.musicapp.musicservice.dto.request.AlbumGeneralCreateRequest
+import com.musicapp.musicservice.dto.request.ArtistModifyRequest
+import com.musicapp.musicservice.dto.request.TrackDataModifyRequest
+import com.musicapp.musicservice.dto.request.TrackViewCreateRequest
+import com.musicapp.musicservice.dto.response.statistics.SimplifiedHistoryEntryResponse
+import com.musicapp.musicservice.dto.response.statistics.SimplifiedUserHistoryResponse
+import com.musicapp.musicservice.gateway.StatisticsClient
+import com.musicapp.musicservice.gateway.StatisticsKafkaProducer
+import com.musicapp.musicservice.gateway.event.HistoryEntryAddEvent
+import com.musicapp.musicservice.gateway.event.TrackDataUploadedEvent
+import com.musicapp.musicservice.service.AlbumService
+import com.musicapp.musicservice.service.ArtistService
+import com.musicapp.musicservice.service.StatisticsService
+import com.musicapp.musicservice.service.TrackService
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.verify
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import java.time.Instant
+import java.time.LocalDate
+import java.util.UUID
+import kotlin.test.assertEquals
+
+@SpringBootTest
+@ExtendWith(MockKExtension::class)
+class HistoryIntegrationTest : BaseIntegrationTest() {
+    @Autowired
+    private lateinit var albumService: AlbumService
+
+    @Autowired
+    private lateinit var artistService: ArtistService
+
+    @Autowired
+    private lateinit var trackService: TrackService
+
+    @Autowired
+    private lateinit var statisticsService: StatisticsService
+
+    @MockkBean(relaxed = true)
+    private lateinit var statisticsKafkaProducer: StatisticsKafkaProducer
+
+    @MockkBean(relaxed = true)
+    private lateinit var statisticsClient: StatisticsClient
+
+    @Test
+    fun shouldAddHistoryEntry() {
+        val userId = UUID.randomUUID()
+        val trackId = UUID.randomUUID()
+        statisticsService.addToHistory(userId, trackId)
+
+        val expectedEvent = HistoryEntryAddEvent(userId, trackId)
+        verify {
+            statisticsKafkaProducer.addHistoryEntry(eq(expectedEvent))
+        }
+    }
+
+    @Test
+    fun shouldCorrectlyRepresentHistory() {
+        val artistId = artistService.createArtist(ArtistModifyRequest("Artist")).id
+        val trackDataId = trackService.createTrackData(TrackDataModifyRequest("Title", setOf(artistId))).id
+        trackService.trackDataUploaded(TrackDataUploadedEvent(trackDataId, 2))
+        val tracksAmount = 10
+        val tracksRequest = List(tracksAmount) {TrackViewCreateRequest("Track-${it}", trackDataId)}
+        val albumDto = albumService.createAlbum(AlbumCreateRequest(artistId, LocalDate.now(), AlbumGeneralCreateRequest("Title", tracksRequest)))
+        val tracks = albumDto.tracks.map { it.id }
+        val userId = UUID.randomUUID()
+
+        every {statisticsClient.getUserHistory(userId, tracksAmount)} returns SimplifiedUserHistoryResponse(
+            tracks.map { SimplifiedHistoryEntryResponse(it, Instant.now()) }
+        )
+
+        val userHistory = statisticsService.getUserHistory(userId, tracksAmount).history
+        assertEquals(tracksAmount, userHistory.size)
+        userHistory.forEachIndexed { index, response ->
+            val trackDto = response.track
+            assertEquals(trackDto.id, tracks[index])
+        }
+    }
+}
