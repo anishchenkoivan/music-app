@@ -3,16 +3,17 @@ package com.musicapp.musicservice.service;
 import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
 import com.musicapp.musicservice.dto.request.TrackViewCreateRequest;
-import com.musicapp.musicservice.dto.response.album.AlbumCreateResponse;
 import com.musicapp.musicservice.dto.response.artist.ArtistAlbumsResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackView;
 import com.musicapp.musicservice.exception.CopyrightException;
 import com.musicapp.musicservice.repository.AlbumRepository;
+import com.musicapp.musicservice.service.events.TrackViewCreatedEvent;
 import com.musicapp.musicservice.util.AlbumFactory;
 import com.musicapp.musicservice.util.TrackFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class AlbumService {
     private final TrackService trackService;
     private final AlbumFactory albumFactory;
     private final TrackFactory trackFactory;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public AlbumService(
@@ -33,13 +35,15 @@ public class AlbumService {
             ArtistService artistService,
             TrackService trackService,
             AlbumFactory albumFactory,
-            TrackFactory trackFactory
+            TrackFactory trackFactory,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.albumRepository = albumRepository;
         this.artistService = artistService;
         this.trackService = trackService;
         this.albumFactory = albumFactory;
         this.trackFactory = trackFactory;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -65,6 +69,10 @@ public class AlbumService {
             album.addTrack(trackView);
         }
         albumRepository.save(album);
+        album.getTracks().forEach(
+                track ->
+                        eventPublisher.publishEvent(new TrackViewCreatedEvent(track.getId(), track.getTitle()))
+        );
         return albumFactory.toAlbumDto(album);
     }
 

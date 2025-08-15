@@ -16,7 +16,7 @@ class StatisticsService(
     ) {
     fun getUserHistory(userId: UUID, limit: Int?) : UserHistoryResponse {
         val simplifiedHistory = statisticsClient.getUserHistory(userId, limit)
-        val tracks = trackService.getTrackTrackViewsById(simplifiedHistory.history.map { it.trackId })
+        val tracks = trackService.getTrackViewsById(simplifiedHistory.history.map { it.trackId })
         return UserHistoryResponse(
             history = tracks.zip(simplifiedHistory.history) { track, simplifiedHistoryEntry ->
                 UserHistoryEntryResponse(

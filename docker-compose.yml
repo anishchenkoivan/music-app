@@ -87,6 +87,22 @@ services:
         soft: 262144
         hard: 262144
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.1
+    container_name: elasticsearch
+    environment:
+      - node.name=es-node
+      - cluster.name=es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
 volumes:
   postgres_user_data:
   postgres_music_data:
@@ -94,3 +110,4 @@ volumes:
   minio_streaming_data:
   clickhouse_data:
   clickhouse_logs:
+  es_data:
