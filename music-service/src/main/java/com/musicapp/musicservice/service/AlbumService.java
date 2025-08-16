@@ -9,6 +9,7 @@ import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackView;
 import com.musicapp.musicservice.exception.CopyrightException;
 import com.musicapp.musicservice.repository.AlbumRepository;
+import com.musicapp.musicservice.service.events.AlbumCreatedEvent;
 import com.musicapp.musicservice.service.events.TrackViewCreatedEvent;
 import com.musicapp.musicservice.util.AlbumFactory;
 import com.musicapp.musicservice.util.TrackFactory;
@@ -69,6 +70,8 @@ public class AlbumService {
             album.addTrack(trackView);
         }
         albumRepository.save(album);
+
+        eventPublisher.publishEvent(new AlbumCreatedEvent(album.getId(), album.getTitle()));
         album.getTracks().forEach(
                 track ->
                         eventPublisher.publishEvent(new TrackViewCreatedEvent(track.getId(), track.getTitle()))
@@ -83,5 +86,10 @@ public class AlbumService {
                 albumRepository.findByArtist(artist)
                         .stream().map(albumFactory::toAlbumDto).toList()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<AlbumDto> getAlbumsById(List<UUID> ids) {
+        return albumRepository.findAllById(ids).stream().map(albumFactory::toAlbumDto).toList();
     }
 }

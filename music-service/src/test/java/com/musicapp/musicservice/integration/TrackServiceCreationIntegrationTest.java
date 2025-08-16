@@ -32,7 +32,6 @@ public class TrackServiceCreationIntegrationTest extends BaseIntegrationTest {
     @Value("${track-uploaded-topic}")
     private String trackUploadedTopic;
 
-    // TODO: Test fails sometimes, investigate
     @Test
     public void shouldCreateTrackDataAndVerifyDataUpload() {
         TrackDataUploadResponse response = trackService.createTrackData(new TrackDataModifyRequest(

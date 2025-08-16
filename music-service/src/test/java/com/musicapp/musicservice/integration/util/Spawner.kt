@@ -35,4 +35,16 @@ class Spawner {
     }
 
     fun spawnTracks(size: Int) = spawnTracks(List(size) { "Title-$it"})
+
+    fun spawnAlbums(titles: List<String>) : List<UUID> {
+        val artistId = artistService.createArtist(ArtistModifyRequest("Artist")).id
+        val trackDataId = trackService.createTrackData(TrackDataModifyRequest("Title", setOf(artistId))).id
+        trackService.trackDataUploaded(TrackDataUploadedEvent(trackDataId, 2))
+        val tracksRequest = listOf(TrackViewCreateRequest("-", trackDataId))
+        return titles.map { albumService.createAlbum(AlbumCreateRequest(artistId, LocalDate.now(), AlbumGeneralCreateRequest(it, tracksRequest))).id }
+    }
+
+    fun spawnArtists(names: List<String>) : List<UUID> {
+        return names.map { artistService.createArtist(ArtistModifyRequest(it)).id }
+    }
 }

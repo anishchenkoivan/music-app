@@ -1,16 +1,11 @@
 package com.musicapp.musicservice.integration
 
-import com.musicapp.musicservice.dto.request.AlbumCreateRequest
-import com.musicapp.musicservice.dto.request.AlbumGeneralCreateRequest
-import com.musicapp.musicservice.dto.request.ArtistModifyRequest
-import com.musicapp.musicservice.dto.request.TrackDataModifyRequest
-import com.musicapp.musicservice.dto.request.TrackViewCreateRequest
 import com.musicapp.musicservice.dto.response.statistics.SimplifiedHistoryEntryResponse
 import com.musicapp.musicservice.dto.response.statistics.SimplifiedUserHistoryResponse
 import com.musicapp.musicservice.gateway.StatisticsClient
 import com.musicapp.musicservice.gateway.StatisticsKafkaProducer
 import com.musicapp.musicservice.gateway.event.HistoryEntryAddEvent
-import com.musicapp.musicservice.gateway.event.TrackDataUploadedEvent
+import com.musicapp.musicservice.integration.util.Spawner
 import com.musicapp.musicservice.service.AlbumService
 import com.musicapp.musicservice.service.ArtistService
 import com.musicapp.musicservice.service.StatisticsService
@@ -23,14 +18,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.assertEquals
 
 @SpringBootTest
 @ExtendWith(MockKExtension::class)
 class HistoryIntegrationTest : BaseIntegrationTest() {
+    @TestConfiguration
+    open class TestConfig {
+        @Bean
+        open fun spawner(): Spawner = Spawner()
+    }
+
     @Autowired
     private lateinit var albumService: AlbumService
 
@@ -49,6 +51,9 @@ class HistoryIntegrationTest : BaseIntegrationTest() {
     @MockkBean(relaxed = true)
     private lateinit var statisticsClient: StatisticsClient
 
+    @Autowired
+    private lateinit var spawner: Spawner
+
     @Test
     fun shouldAddHistoryEntry() {
         val userId = UUID.randomUUID()
@@ -63,13 +68,8 @@ class HistoryIntegrationTest : BaseIntegrationTest() {
 
     @Test
     fun shouldCorrectlyRepresentHistory() {
-        val artistId = artistService.createArtist(ArtistModifyRequest("Artist")).id
-        val trackDataId = trackService.createTrackData(TrackDataModifyRequest("Title", setOf(artistId))).id
-        trackService.trackDataUploaded(TrackDataUploadedEvent(trackDataId, 2))
         val tracksAmount = 10
-        val tracksRequest = List(tracksAmount) {TrackViewCreateRequest("Track-${it}", trackDataId)}
-        val albumDto = albumService.createAlbum(AlbumCreateRequest(artistId, LocalDate.now(), AlbumGeneralCreateRequest("Title", tracksRequest)))
-        val tracks = albumDto.tracks.map { it.id }
+        val tracks = spawner.spawnTracks(tracksAmount)
         val userId = UUID.randomUUID()
 
         every {statisticsClient.getUserHistory(userId, tracksAmount)} returns SimplifiedUserHistoryResponse(

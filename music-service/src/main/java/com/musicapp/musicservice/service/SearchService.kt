@@ -1,9 +1,11 @@
 package com.musicapp.musicservice.service
 
-import co.elastic.clients.elasticsearch._types.query_dsl.Query
 import com.musicapp.musicservice.document.AlbumDocument
 import com.musicapp.musicservice.document.ArtistDocument
 import com.musicapp.musicservice.document.TrackDocument
+import com.musicapp.musicservice.dto.response.search.AlbumSearchResponse
+import com.musicapp.musicservice.dto.response.search.ArtistSearchResponse
+import com.musicapp.musicservice.dto.response.search.SearchResponse
 import com.musicapp.musicservice.dto.response.search.TrackSearchResponse
 import com.musicapp.musicservice.repository.AlbumSearchRepository
 import com.musicapp.musicservice.repository.ArtistSearchRepository
@@ -36,11 +38,13 @@ class SearchService(
         trackSearchRepository.save(trackDocument)
     }
 
+    @TransactionalEventListener
     fun saveAlbumToIndex(event: AlbumCreatedEvent) {
         val albumDocument = AlbumDocument(event.id, event.title)
         albumSearchRepository.save(albumDocument)
     }
 
+    @TransactionalEventListener
     fun saveArtistToIndex(event: ArtistCreatedEvent) {
         val artistDocument = ArtistDocument(event.id, event.name)
         artistSearchRepository.save(artistDocument)
@@ -49,19 +53,29 @@ class SearchService(
     fun searchTrack(title: String) : TrackSearchResponse {
         val query = queryBuilder.singleFieldQuery("title", title)
         val result = operations.search(query, TrackDocument::class.java).map { it.content }
-        val foundTracks = trackService.getTrackViewsById(result.map { it.id }.toMutableList())
+        val foundTracks = trackService.getTrackViewsById(result.map { it.id }.toList())
         return TrackSearchResponse(foundTracks)
     }
 
-    fun searchAlbum() {
-
+    fun searchAlbum(title: String) : AlbumSearchResponse {
+        val query = queryBuilder.singleFieldQuery("title", title)
+        val result = operations.search(query, AlbumDocument::class.java).map { it.content }
+        val foundAlbums = albumService.getAlbumsById(result.map { it.id }.toList())
+        return AlbumSearchResponse(foundAlbums)
     }
 
-    fun searchArtist() {
-
+    fun searchArtist(name: String) : ArtistSearchResponse {
+        val query = queryBuilder.singleFieldQuery("name", name)
+        val result = operations.search(query, ArtistDocument::class.java).map { it.content }
+        val foundArtists = artistService.getArtistsById(result.map { it.id }.toList())
+        return ArtistSearchResponse(foundArtists)
     }
 
-    fun searchAll() {
-
+    fun searchAll(query: String) : SearchResponse {
+        return SearchResponse(
+            searchTrack(query),
+            searchAlbum(query),
+            searchArtist(query),
+        )
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import kotlin.test.assertContains
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @SpringBootTest
@@ -27,12 +28,13 @@ class SearchTest : ElasticSearchBaseIntegrationTest() {
 
     @Test
     fun shouldFindTrack() {
-        val titles = listOf("Title", "TitleA", "A title", "Two words", "Two, words!", "Three words title")
+        val titles = listOf("Title", "TitleA", "A title", "Two words", "Two, words!", "Three words title", "Hidden")
         spawner.spawnTracks(titles)
 
         var result: TrackSearchResponse? = null;
         result = searchService.searchTrack("Title")
         assertContains(result.tracks.map { it.title }, "Title")
+        assertFalse(result.tracks.map { it.title }.contains("Hidden"))
 
         result = searchService.searchTrack("TitleA")
         assertTrue(result.tracks.map { it.title }.containsAll(listOf("TitleA", "A title")))
@@ -45,5 +47,21 @@ class SearchTest : ElasticSearchBaseIntegrationTest() {
 
         result = searchService.searchTrack("words two")
         assertContains(result.tracks.map { it.title }, "Two words")
+    }
+
+    @Test
+    fun shouldFindAlbum() {
+        val titles = listOf("Album")
+        spawner.spawnAlbums(titles)
+        val result = searchService.searchAlbum("Album")
+        assertContains(result.albums.map { it.title }, "Album")
+    }
+
+    @Test
+    fun shouldFindArtist() {
+        val names = listOf("Name", "Another Name")
+        spawner.spawnArtists(names)
+        val result = searchService.searchArtist("Name")
+        assertContains(result.artists.map { it.name }, "Name")
     }
 }
