@@ -5,22 +5,30 @@ import com.musicapp.musicservice.dto.request.ArtistModifyRequest;
 import com.musicapp.musicservice.dto.response.artist.ArtistCreateResponse;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.repository.ArtistRepository;
+import com.musicapp.musicservice.service.events.ArtistCreatedEvent;
 import com.musicapp.musicservice.util.ArtistFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ArtistService {
     private final ArtistRepository artistRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public ArtistService(ArtistRepository artistRepository) {
+    public ArtistService(
+            ArtistRepository artistRepository,
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.artistRepository = artistRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -34,15 +42,17 @@ public class ArtistService {
     }
 
     @Transactional(propagation =  Propagation.REQUIRED)
-    public Artist createArtistEntity(ArtistModifyRequest artistModifyRequest) {
+    protected Artist createArtistEntity(ArtistModifyRequest artistModifyRequest) {
         Artist artist = ArtistFactory.artist(artistModifyRequest);
         artistRepository.save(artist);
+        eventPublisher.publishEvent(new ArtistCreatedEvent(artist.getId(), artist.getName()));
         return artist;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional
     public ArtistCreateResponse createArtist(ArtistModifyRequest artistModifyRequest) {
-        return new ArtistCreateResponse(createArtistEntity(artistModifyRequest).getId());
+        Artist artist = createArtistEntity(artistModifyRequest);
+        return new ArtistCreateResponse(artist.getId());
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -60,5 +70,10 @@ public class ArtistService {
     @Transactional(propagation = Propagation.SUPPORTS)
     public ArtistDto getArtistForUser(UUID userId) {
         return ArtistFactory.toArtistDto(getArtistEntityForUser(userId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArtistDto> getArtistsById(List<UUID> ids) {
+        return artistRepository.findAllById(ids).stream().map(ArtistFactory::toArtistDto).toList();
     }
 }

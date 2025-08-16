@@ -36,7 +36,14 @@ public class TrackService {
     private final AlbumRepository albumRepository;
 
     @Autowired
-    public TrackService(TrackViewRepository trackViewRepository, TrackDataRepository trackDataRepository, ArtistService artistService, JwtService jwtService, TrackFactory trackFactory, AlbumRepository albumRepository) {
+    public TrackService(
+            TrackViewRepository trackViewRepository,
+            TrackDataRepository trackDataRepository,
+            ArtistService artistService,
+            JwtService jwtService,
+            TrackFactory trackFactory,
+            AlbumRepository albumRepository
+    ) {
         this.trackViewRepository = trackViewRepository;
         this.trackDataRepository = trackDataRepository;
         this.artistService = artistService;
@@ -129,7 +136,7 @@ public class TrackService {
     }
 
     @Transactional(readOnly = true)
-    public List<TrackDto> getTrackTrackViewsById(List<UUID> ids) {
+    public List<TrackDto> getTrackViewsById(List<UUID> ids) {
         return trackViewRepository.findAllById(ids).stream().map(trackFactory::toTrackDto).toList();
     }
 }

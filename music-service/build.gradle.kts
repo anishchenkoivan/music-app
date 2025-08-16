@@ -31,6 +31,8 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt:0.12.6")
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch:3.5.4")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
@@ -39,12 +41,12 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:postgresql:1.21.3")
     testImplementation("org.testcontainers:kafka:1.21.3")
+    testImplementation("org.testcontainers:elasticsearch:1.21.3")
     testImplementation("org.testcontainers:junit-jupiter:1.21.3")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.mockk:mockk:1.14.5")
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test"))
-
 }
 
 dependencyManagement {
