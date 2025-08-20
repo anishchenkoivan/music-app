@@ -1,0 +1,76 @@
+include:
+  - docker-compose.infra.yml
+
+services:
+  eureka:
+    build: ./eureka
+    environment:
+      EUREKA_HOSTNAME: eureka
+
+  gateway_service:
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka
+    environment:
+      EUREKA_URL: http://eureka:8761/eureka
+
+  auth_service:
+    build: ./auth-service
+    depends_on:
+      - eureka
+      - postgres_auth_service
+    environment:
+      AUTH_SERVICE_DB_HOST: postgres_auth_service
+      AUTH_SERVICE_DB_PORT: 5432
+      EUREKA_URL: http://eureka:8761/eureka
+
+  music_service:
+    build: ./music-service
+    depends_on:
+      - eureka
+      - postgres_music_service
+      - kafka
+      - elasticsearch
+    environment:
+      MUSIC_SERVICE_DB_HOST: postgres_music_service
+      MUSIC_SERVICE_DB_PORT: 5432
+      STREAMING_SERVICE_BASE_URL: http://streaming_service:8084
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      EUREKA_URL: http://eureka:8761/eureka
+
+  user_service:
+    build: ./user-service
+    depends_on:
+      - eureka
+      - postgres_user_service
+    environment:
+      USER_SERVICE_DB_HOST: postgres_user_service
+      USER_SERVICE_DB_PORT: 5432
+      EUREKA_URL: http://eureka:8761/eureka
+
+  streaming_service:
+    build: ./streaming-service
+    depends_on:
+      - eureka
+      - minio
+      - kafka
+    environment:
+      MINIO_URL: http://minio:9002
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+
+  statistics_service:
+    build: ./statistics-service
+    depends_on:
+      - kafka
+      - eureka
+      - clickhouse
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
