@@ -55,11 +55,16 @@ spring:
             - id: music-service-user
               uri: lb:music-service
               predicates:
-                - Path=/api/user/**
+                - Path=/api/user/music/**
               filters:
                 - StripPrefix=1
+
+            - id: music-service-search
+              uri: lb:music-service
+              predicates:
+                - Path=/api/search
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}

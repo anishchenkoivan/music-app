@@ -1,5 +1,5 @@
 minio:
-  url: http://localhost:9000
+  url: ${MINIO_URL:http://localhost:9002}
   access-key: minioadmin
   secret-key: minioadmin
   bucket: audio
@@ -10,4 +10,4 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}

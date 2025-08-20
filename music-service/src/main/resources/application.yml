@@ -1,5 +1,5 @@
 spring:
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
   elasticsearch:
-    uris: http://localhost:9200
+    uris: ${ELASTICSEARCH_URL:http://localhost:9200}

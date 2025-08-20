@@ -1,6 +1,8 @@
 spring:
   datasource:
-    url: jdbc:clickhouse://localhost:8123/default
+    url: jdbc:clickhouse://${CLICKHOUSE_HOST:localhost}:${CLICKHOUSE_PORT:8123}/default
     username: user
     password: password
     driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
