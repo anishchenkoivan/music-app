@@ -1,5 +1,5 @@
 plugins {
-	kotlin("jvm") version "1.9.25"
+	kotlin("jvm") version "2.2.0"
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.5.4"
 	id("io.spring.dependency-management") version "1.1.7"
@@ -24,6 +24,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.minio:minio:8.5.17")
+    implementation("io.jsonwebtoken:jjwt:0.12.6")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")

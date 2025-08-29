@@ -21,10 +21,10 @@ public class JwtService {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
 
-    public String generateUploadToken(UUID trackDataId) {
+    public String generateUploadToken(UUID resourceId) {
         return Jwts.builder()
-                .subject(trackDataId.toString())
-                .claim("action", TrackActions.UPLOAD)
+                .subject(resourceId.toString())
+                .claim("action", FileActions.UPLOAD)
                 .signWith(secretKey)
                 .compact();
     }
