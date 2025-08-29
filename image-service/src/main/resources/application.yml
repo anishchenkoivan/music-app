@@ -1,0 +1,11 @@
+minio:
+  url: ${MINIO_URL:http://localhost:9002}
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: audio
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
