@@ -12,16 +12,16 @@ import java.util.Base64;
 import java.util.UUID;
 
 @Service
-public class StreamingTokenService {
+public class TokenService {
     @Value("${hmac.secret}")
     private String secretKey;
     @Value("${streaming.timeout.seconds}")
     private int timeoutSeconds;
 
-    public String generateToken(UUID trackId) {
+    public String generateToken(UUID id) {
         Duration validDuration = Duration.ofSeconds(timeoutSeconds);
         long expiry = Instant.now().plus(validDuration).getEpochSecond();
-        String payload = trackId + ":" + expiry;
+        String payload = id + ":" + expiry;
 
         try {
             Mac hmac = Mac.getInstance("HmacSHA256");

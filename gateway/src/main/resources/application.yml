@@ -63,6 +63,15 @@ spring:
               uri: lb:music-service
               predicates:
                 - Path=/api/search
+              filters:
+                - StripPrefix=1
+
+            - id: image-service
+            - uri: lb:image-service
+            - predicates:
+                - Path=/api/images/**
+            - filters:
+              - StripPrefix=1
 
 eureka:
   client:

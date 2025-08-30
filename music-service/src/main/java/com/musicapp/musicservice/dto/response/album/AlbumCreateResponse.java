@@ -1,6 +1,6 @@
 package com.musicapp.musicservice.dto.response.album;
 
-import java.util.UUID;
+import com.musicapp.musicservice.dto.AlbumDto;
 
-public record AlbumCreateResponse(UUID id) {
+public record AlbumCreateResponse(AlbumDto album, String imageUploadToken) {
 }

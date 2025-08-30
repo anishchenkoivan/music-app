@@ -3,12 +3,15 @@ package com.musicapp.musicservice.service;
 import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
 import com.musicapp.musicservice.dto.request.TrackViewCreateRequest;
+import com.musicapp.musicservice.dto.response.album.AlbumCreateResponse;
 import com.musicapp.musicservice.dto.response.artist.ArtistAlbumsResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.entity.TrackView;
 import com.musicapp.musicservice.exception.CopyrightException;
 import com.musicapp.musicservice.repository.AlbumRepository;
+import com.musicapp.musicservice.security.JwtService;
+import com.musicapp.musicservice.security.TokenService;
 import com.musicapp.musicservice.service.events.AlbumCreatedEvent;
 import com.musicapp.musicservice.service.events.TrackViewCreatedEvent;
 import com.musicapp.musicservice.util.AlbumFactory;
@@ -29,6 +32,7 @@ public class AlbumService {
     private final AlbumFactory albumFactory;
     private final TrackFactory trackFactory;
     private final ApplicationEventPublisher eventPublisher;
+    private final JwtService jwtService;
 
     @Autowired
     public AlbumService(
@@ -37,14 +41,15 @@ public class AlbumService {
             TrackService trackService,
             AlbumFactory albumFactory,
             TrackFactory trackFactory,
-            ApplicationEventPublisher eventPublisher
-    ) {
+            ApplicationEventPublisher eventPublisher,
+            JwtService jwtService) {
         this.albumRepository = albumRepository;
         this.artistService = artistService;
         this.trackService = trackService;
         this.albumFactory = albumFactory;
         this.trackFactory = trackFactory;
         this.eventPublisher = eventPublisher;
+        this.jwtService = jwtService;
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +58,7 @@ public class AlbumService {
     }
 
     @Transactional
-    public AlbumDto createAlbum(AlbumCreateRequest albumCreateRequest) {
+    public AlbumCreateResponse createAlbum(AlbumCreateRequest albumCreateRequest) {
         List<TrackView> tracks = albumCreateRequest.generalData().tracks().stream()
                 .map((TrackViewCreateRequest trackViewData) -> trackFactory.trackView(
                         trackViewData.title(),
@@ -65,7 +70,8 @@ public class AlbumService {
         Album album = albumFactory.album(albumCreateRequest.generalData().title(), artist);
         for (TrackView trackView : tracks) {
             if (!trackView.getTrackData().getArtists().contains(artist)) {
-                throw new CopyrightException("Track " + trackView.getTrackData().getTitle() + " does not belong to artist " + artist.getName());
+                throw new CopyrightException("Track " + trackView.getTrackData().getTitle() +
+                        " does not belong to artist " + artist.getName());
             }
             album.addTrack(trackView);
         }
@@ -76,7 +82,7 @@ public class AlbumService {
                 track ->
                         eventPublisher.publishEvent(new TrackViewCreatedEvent(track.getId(), track.getTitle()))
         );
-        return albumFactory.toAlbumDto(album);
+        return new AlbumCreateResponse(albumFactory.toAlbumDto(album), jwtService.generateUploadToken(album.getId()));
     }
 
     @Transactional(readOnly = true)
