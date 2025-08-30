@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import javax.crypto.SecretKey
 
 @Service
-class JwtService(@param:Value("jwt.secret") private val secretKeyString: String) {
+class JwtService(@param:Value($$"${jwt.secret}") private val secretKeyString: String) {
     private lateinit var secretKey: SecretKey
 
     @PostConstruct

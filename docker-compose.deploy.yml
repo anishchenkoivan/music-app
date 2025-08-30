@@ -74,3 +74,10 @@ services:
       CLICKHOUSE_PORT: 8123
       KAFKA_HOST: kafka
       KAFKA_PORT: 9092
+
+  image_service:
+    build: ./image-service
+    depends_on:
+      - minio
+    environment:
+      MINIO_URL: http://minio:9002
