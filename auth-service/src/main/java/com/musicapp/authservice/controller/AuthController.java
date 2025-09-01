@@ -69,7 +69,7 @@ public class AuthController {
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ApiError> UserNotFoundExceptionHandler(UserNotFoundException e) {
         return new ResponseEntity<>(
                 new ApiError(e.getMessage()),

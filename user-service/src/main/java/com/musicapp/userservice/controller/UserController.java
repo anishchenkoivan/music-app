@@ -59,7 +59,7 @@ public class UserController {
         return userService.getId(request.email(), request.username());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ValidateException.class)
     public ResponseEntity<ApiError> ValidateExceptionHandler(ValidateException e) {
         return new ResponseEntity<>(
                 new ApiError(e.getMessage()),
@@ -67,7 +67,7 @@ public class UserController {
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiError> NoSuchElementExceptionHandler(NoSuchElementException e) {
         return new ResponseEntity<>(
                 new ApiError(e.getMessage()),
@@ -75,7 +75,7 @@ public class UserController {
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(CreateException.class)
     public ResponseEntity<ApiError> CreateExceptionHandler(CreateException e) {
         return new ResponseEntity<>(
                 new ApiError(e.getMessage()),
