@@ -66,6 +66,20 @@ spring:
               filters:
                 - StripPrefix=1
 
+            - id: music-service-stream
+              uri: lb:music-service
+              predicates:
+                - Path=/api/stream/**
+              filters:
+                - StripPrefix=1
+
+            - id: streaming-service-stream
+              uri: lb:streaming-service
+              predicates:
+                - Path=/api/audio/**
+              filters:
+                - StripPrefix=1
+
             - id: image-service
             - uri: lb:image-service
             - predicates:
