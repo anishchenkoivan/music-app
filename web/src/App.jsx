@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuthStore } from './store/authStore.js';
+import { useThemeStore } from './store/themeStore.js';
 import LoginForm from './components/auth/LoginForm.jsx';
 import RegisterForm from './components/auth/RegisterForm.jsx';
 import AudioPlayer from './components/player/AudioPlayer.jsx';
@@ -7,6 +9,7 @@ import PlayerControls from './components/player/PlayerControls.jsx';
 import TrackUpload from './components/upload/TrackUpload.jsx';
 import SearchBar from './components/search/SearchBar.jsx';
 import PlaylistManager from './components/playlist/PlaylistManager.jsx';
+import ThemeToggle from './components/theme/ThemeToggle.jsx';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -28,24 +31,32 @@ function Home() {
 // Main App component
 export default function App() {
   const { isAuthenticated, logout, user } = useAuthStore();
+  const theme = useThemeStore(state => state.theme);
+
+  // Apply theme to document root
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   return (
     <BrowserRouter>
       <div className="app">
         <header className="app-header">
           <nav>
-            <Link to="/">Home</Link>
+            <Link to="/">🎵 Home</Link>
             {isAuthenticated ? (
               <>
-                <Link to="/upload">Upload</Link>
-                <Link to="/playlists">Playlists</Link>
-                <span>Welcome, {user?.username || 'User'}</span>
-                <button onClick={logout}>Logout</button>
+                <Link to="/upload">📤 Upload</Link>
+                <Link to="/playlists">📋 Playlists</Link>
+                <span>👋 Welcome, {user?.username || 'User'}</span>
+                <ThemeToggle />
+                <button onClick={logout}>🚪 Logout</button>
               </>
             ) : (
               <>
-                <Link to="/login">Login</Link>
-                <Link to="/register">Register</Link>
+                <Link to="/login">🔐 Login</Link>
+                <Link to="/register">✨ Register</Link>
+                <ThemeToggle />
               </>
             )}
           </nav>

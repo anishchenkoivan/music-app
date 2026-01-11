@@ -31,39 +31,54 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="login-form">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
+    <div className="auth-container">
+      <div className="card auth-card">
+        <div className="card-header">
+          <h2 className="card-title">🔐 Welcome Back</h2>
+          <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+            Login to access your music library
+          </p>
         </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">📧 Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">🔒 Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              disabled={loading}
+            />
+          </div>
 
-        {error && <div className="error">{error}</div>}
+          {error && <div className="error">❌ {error}</div>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+          <button type="submit" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="loading"></span> Logging in...
+              </>
+            ) : (
+              '🚀 Login'
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

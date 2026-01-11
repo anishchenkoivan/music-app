@@ -41,33 +41,45 @@ export default function SearchBar() {
 
   return (
     <div className="search-bar">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={() => query.length >= 2 && setShowResults(true)}
-        onBlur={() => setTimeout(() => setShowResults(false), 200)}
-        placeholder="Search tracks, artists..."
-        className="search-input"
-      />
-      
-      {isLoading && <div className="search-loading">Searching...</div>}
+      <div style={{ position: 'relative' }}>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => query.length >= 2 && setShowResults(true)}
+          onBlur={() => setTimeout(() => setShowResults(false), 200)}
+          placeholder="🔍 Search tracks, artists, albums..."
+          className="search-input"
+        />
+        {isLoading && (
+          <div style={{
+            position: 'absolute',
+            right: '1rem',
+            top: '50%',
+            transform: 'translateY(-50%)'
+          }}>
+            <span className="loading"></span>
+          </div>
+        )}
+      </div>
 
       {showResults && (results.tracks.length > 0 || results.artists.length > 0) && (
         <div className="search-results">
           {results.tracks.length > 0 && (
             <div className="results-section">
-              <h3>Tracks</h3>
+              <h3>🎵 Tracks</h3>
               <ul>
                 {results.tracks.map(track => (
-                  <li 
+                  <li
                     key={track.id}
                     onClick={() => handleTrackClick(track)}
                   >
-                    <span className="track-title">{track.title}</span>
-                    <span className="track-artists">
-                      {track.artists?.map(a => a.name).join(', ')}
-                    </span>
+                    <div>
+                      <span className="track-title">▶️ {track.title}</span>
+                      <span className="track-artists">
+                        👤 {track.artists?.map(a => a.name).join(', ') || 'Unknown Artist'}
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -76,11 +88,11 @@ export default function SearchBar() {
 
           {results.artists.length > 0 && (
             <div className="results-section">
-              <h3>Artists</h3>
+              <h3>🎤 Artists</h3>
               <ul>
                 {results.artists.map(artist => (
                   <li key={artist.id}>
-                    <a href={`/artist/${artist.id}`}>{artist.name}</a>
+                    <a href={`/artist/${artist.id}`}>👤 {artist.name}</a>
                   </li>
                 ))}
               </ul>
@@ -89,12 +101,24 @@ export default function SearchBar() {
         </div>
       )}
 
-      {showResults && query.length >= 2 && 
-       results.tracks.length === 0 && 
-       results.artists.length === 0 && 
+      {showResults && query.length >= 2 &&
+       results.tracks.length === 0 &&
+       results.artists.length === 0 &&
        !isLoading && (
         <div className="search-results">
-          <p>No results found for "{query}"</p>
+          <div style={{
+            padding: '2rem',
+            textAlign: 'center',
+            color: 'var(--text-secondary)'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
+            <p style={{ fontSize: '1.1rem', fontWeight: '600' }}>
+              No results found for "{query}"
+            </p>
+            <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+              Try different keywords or check your spelling
+            </p>
+          </div>
         </div>
       )}
     </div>

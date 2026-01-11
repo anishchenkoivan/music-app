@@ -116,104 +116,237 @@ export default function TrackUpload() {
 
   return (
     <div className="track-upload">
-      <h2>Upload Track</h2>
+      <h1>📤 Upload Track</h1>
+      
+      {/* Progress Indicator */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '2rem',
+        padding: '1rem',
+        background: 'var(--bg-secondary)',
+        borderRadius: 'var(--border-radius)',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          color: step >= 1 ? 'var(--accent-primary)' : 'var(--text-tertiary)',
+          fontWeight: step === 1 ? '700' : '500'
+        }}>
+          <span style={{
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+            background: step >= 1 ? 'var(--accent-gradient)' : 'var(--bg-tertiary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 'bold'
+          }}>1</span>
+          <span>Metadata</span>
+        </div>
+        <div style={{
+          width: '50px',
+          height: '2px',
+          background: step >= 2 ? 'var(--accent-primary)' : 'var(--border-color)'
+        }}></div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          color: step >= 2 ? 'var(--accent-primary)' : 'var(--text-tertiary)',
+          fontWeight: step === 2 ? '700' : '500'
+        }}>
+          <span style={{
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+            background: step >= 2 ? 'var(--accent-gradient)' : 'var(--bg-tertiary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 'bold'
+          }}>2</span>
+          <span>Upload File</span>
+        </div>
+      </div>
 
       {step === 1 && (
-        <form onSubmit={handleMetadataSubmit}>
-          <div className="form-group">
-            <label htmlFor="title">Track Title</label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              disabled={loading}
-            />
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">🎵 Track Information</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+              Enter the basic details about your track
+            </p>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="artist">Artist ID</label>
-            {userArtists.length > 0 ? (
-              <select
-                id="artist"
-                value={artistId}
-                onChange={(e) => setArtistId(e.target.value)}
+          <form onSubmit={handleMetadataSubmit}>
+            <div className="form-group">
+              <label htmlFor="title">🎼 Track Title</label>
+              <input
+                id="title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter your track title"
                 required
                 disabled={loading}
-              >
-                {userArtists.map(artist => (
-                  <option key={artist.id} value={artist.id}>
-                    {artist.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div>
-                <p className="info" style={{fontSize: '0.9em', color: '#666', marginBottom: '0.5rem'}}>
-                  No artist profile found. Enter artist ID manually:
-                </p>
-                <input
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="artist">👤 Artist</label>
+              {userArtists.length > 0 ? (
+                <select
                   id="artist"
-                  type="text"
                   value={artistId}
                   onChange={(e) => setArtistId(e.target.value)}
-                  placeholder="Enter artist UUID"
                   required
                   disabled={loading}
-                />
-              </div>
-            )}
-          </div>
+                >
+                  {userArtists.map(artist => (
+                    <option key={artist.id} value={artist.id}>
+                      {artist.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div>
+                  <div className="info" style={{ marginBottom: '0.75rem' }}>
+                    ℹ️ No artist profile found. Enter artist ID manually
+                  </div>
+                  <input
+                    id="artist"
+                    type="text"
+                    value={artistId}
+                    onChange={(e) => setArtistId(e.target.value)}
+                    placeholder="Enter artist UUID"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+              )}
+            </div>
 
-          {error && <div className="error">{error}</div>}
+            {error && <div className="error">❌ {error}</div>}
 
-          <button type="submit" disabled={loading || !artistId}>
-            {loading ? 'Creating...' : 'Next'}
-          </button>
-        </form>
+            <button type="submit" disabled={loading || !artistId}>
+              {loading ? (
+                <>
+                  <span className="loading"></span> Creating...
+                </>
+              ) : (
+                '➡️ Next Step'
+              )}
+            </button>
+          </form>
+        </div>
       )}
 
       {step === 2 && (
-        <div className="file-upload">
-          <div className="form-group">
-            <label htmlFor="file">Select MP3 File</label>
-            <input
-              id="file"
-              type="file"
-              accept=".mp3,audio/mpeg"
-              onChange={handleFileChange}
-              disabled={loading}
-            />
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">📁 Upload Audio File</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+              Select your MP3 file (100KB - 100MB)
+            </p>
           </div>
-
-          {file && (
-            <div className="file-info">
-              <p>Selected: {file.name}</p>
-              <p>Size: {(file.size / 1024 / 1024).toFixed(2)} MB</p>
+          <div className="file-upload">
+            <div className="form-group">
+              <label htmlFor="file">🎵 Select MP3 File</label>
+              <input
+                id="file"
+                type="file"
+                accept=".mp3,audio/mpeg"
+                onChange={handleFileChange}
+                disabled={loading}
+                style={{
+                  padding: '1rem',
+                  border: '2px dashed var(--border-color)',
+                  borderRadius: 'var(--border-radius)',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-speed) ease'
+                }}
+              />
             </div>
-          )}
 
-          {uploadProgress > 0 && (
-            <div className="progress">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${uploadProgress}%` }}
-                />
+            {file && (
+              <div className="file-info">
+                <h4 style={{ marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
+                  ✅ File Selected
+                </h4>
+                <p>📄 <strong>Name:</strong> {file.name}</p>
+                <p>📊 <strong>Size:</strong> {(file.size / 1024 / 1024).toFixed(2)} MB</p>
               </div>
-              <span>{uploadProgress}%</span>
+            )}
+
+            {uploadProgress > 0 && (
+              <div className="progress">
+                <div className="progress-bar" style={{
+                  height: '12px',
+                  background: 'var(--bg-tertiary)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  overflow: 'hidden'
+                }}>
+                  <div
+                    className="progress-fill"
+                    style={{
+                      width: `${uploadProgress}%`,
+                      background: 'var(--accent-gradient)',
+                      height: '100%',
+                      transition: 'width 0.3s ease'
+                    }}
+                  />
+                </div>
+                <span style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  marginTop: '0.75rem',
+                  fontSize: '1.1rem',
+                  fontWeight: '700',
+                  color: 'var(--accent-primary)'
+                }}>
+                  📤 Uploading... {uploadProgress}%
+                </span>
+              </div>
+            )}
+
+            {error && <div className="error">❌ {error}</div>}
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => {
+                  setStep(1);
+                  setFile(null);
+                  setUploadProgress(0);
+                  setError('');
+                }}
+                disabled={loading}
+                style={{ flex: 1 }}
+              >
+                ⬅️ Back
+              </button>
+              <button
+                onClick={handleFileUpload}
+                disabled={!file || loading}
+                style={{ flex: 2 }}
+              >
+                {loading ? (
+                  <>
+                    <span className="loading"></span> Uploading...
+                  </>
+                ) : (
+                  '🚀 Upload Track'
+                )}
+              </button>
             </div>
-          )}
-
-          {error && <div className="error">{error}</div>}
-
-          <button 
-            onClick={handleFileUpload} 
-            disabled={!file || loading}
-          >
-            {loading ? 'Uploading...' : 'Upload'}
-          </button>
+          </div>
         </div>
       )}
     </div>
