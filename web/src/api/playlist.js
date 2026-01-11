@@ -38,19 +38,19 @@ export const playlistAPI = {
 
   // Get user's playlists
   getUserPlaylists: async () => {
-    const response = await api.get('/user/music/playlists');
+    const response = await api.get('/playlists/user');
     return response.data;
   },
 
   // Get user's favorites
   getFavorites: async () => {
-    const response = await api.get('/user/music/favorites');
+    const response = await api.get('/playlists/favorites');
     return response.data;
   },
 
   // Get listening history
   getHistory: async (limit = 50) => {
-    const response = await api.get('/user/music/history', {
+    const response = await api.get('/playlists/history', {
       params: { limit }
     });
     return response.data;
