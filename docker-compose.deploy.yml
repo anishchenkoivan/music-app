@@ -85,3 +85,12 @@ services:
     environment:
       MINIO_URL: http://minio:9002
       EUREKA_URL: http://eureka:8761/eureka
+
+  frontend:
+    build: ./web
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway_service
+    environment:
+      - NODE_ENV=production
