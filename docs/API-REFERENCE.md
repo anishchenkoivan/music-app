@@ -210,7 +210,7 @@ Get user ID by email or username
 
 Base path: `/api/albums`
 
-#### POST /api/albums
+#### POST /api/albums/create
 Create new album
 
 **Headers**: `Authorization: Bearer <token>`
@@ -218,16 +218,13 @@ Create new album
 **Request Body**:
 ```json
 {
-  "artistId": "uuid",
-  "generalData": {
-    "title": "string",
-    "tracks": [
-      {
-        "title": "string",
-        "trackDataId": "uuid"
-      }
-    ]
-  }
+  "title": "string",
+  "tracks": [
+    {
+      "title": "string",
+      "trackDataId": "uuid"
+    }
+  ]
 }
 ```
 
@@ -245,6 +242,8 @@ Create new album
   "uploadToken": "jwt-token"
 }
 ```
+
+**Note**: The artist ID is automatically determined from the authenticated user's artist profile.
 
 ---
 
@@ -277,7 +276,7 @@ Get album details
 
 ---
 
-#### GET /api/albums/artist/{artistId}
+#### GET /api/artists/{artistId}/albums
 Get albums by artist
 
 **Path Parameters**:
@@ -303,7 +302,7 @@ Get albums by artist
 
 Base path: `/api/tracks`
 
-#### POST /api/tracks
+#### POST /api/tracks/upload
 Create new track
 
 **Headers**: `Authorization: Bearer <token>`
@@ -373,8 +372,8 @@ Get multiple tracks by IDs
 
 ---
 
-#### PUT /api/tracks/{id}/like
-Like/unlike track
+#### POST /api/tracks/{id}/like
+Like track
 
 **Headers**: `Authorization: Bearer <token>`
 
@@ -385,7 +384,19 @@ Like/unlike track
 
 ---
 
-#### GET /api/tracks/artist/{artistId}
+#### POST /api/tracks/{id}/unlike
+Unlike track
+
+**Headers**: `Authorization: Bearer <token>`
+
+**Path Parameters**:
+- `id` (uuid) - Track ID
+
+**Response**: `200 OK`
+
+---
+
+#### GET /api/artists/{artistId}/tracks
 Get tracks by artist
 
 **Path Parameters**:
@@ -459,7 +470,7 @@ Get artists by user
 
 Base path: `/api/playlists`
 
-#### POST /api/playlists
+#### POST /api/playlists/create
 Create playlist
 
 **Headers**: `Authorization: Bearer <token>`
@@ -497,7 +508,7 @@ Get playlist details
 
 ---
 
-#### PUT /api/playlists/{id}
+#### PUT /api/playlists/{id}/update
 Update playlist
 
 **Headers**: `Authorization: Bearer <token>`
@@ -633,10 +644,21 @@ Get user's play history
 
 **Headers**: `Authorization: Bearer <token>`
 
+**Query Parameters**:
+- `limit` (int, required) - Number of history entries to return
+
 **Response**:
 ```json
 {
-  "tracks": [...]
+  "userId": "uuid",
+  "entries": [
+    {
+      "trackId": "uuid",
+      "playedAt": "timestamp",
+      "duration": 180
+    }
+  ],
+  "totalPlays": 1234
 }
 ```
 

@@ -79,5 +79,16 @@ services:
     build: ./image-service
     depends_on:
       - minio
+      - eureka
     environment:
       MINIO_URL: http://minio:9002
+      EUREKA_URL: http://eureka:8761/eureka
+
+  frontend:
+    build: ./web
+    ports:
+      - "3000:80"
+    environment:
+      API_URL: ${API_URL:-http://localhost:8080}
+    depends_on:
+      - gateway_service
