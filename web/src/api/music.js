@@ -8,7 +8,7 @@ export const musicAPI = {
   },
 
   uploadTrackMetadata: async (title, artistIds) => {
-    const response = await api.post('/tracks', { title, artistIds });
+    const response = await api.post('/tracks/upload', { title, artistIds });
     return response.data; // { trackId, uploadToken }
   },
 
