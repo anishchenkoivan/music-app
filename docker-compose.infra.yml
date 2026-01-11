@@ -1,17 +1,16 @@
 services:
   postgres_user_service:
-    image: postgres
+    image: postgres:16
     container_name: postgres_user_service
     environment:
       POSTGRES_DB: user_db
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
     volumes:
       - postgres_user_data:/var/lib/postgresql/data
 
   postgres_music_service:
-    image: postgres
+    image: postgres:16
     container_name: postgres_music_service
     environment:
       POSTGRES_DB: music_db
@@ -21,7 +20,7 @@ services:
       - postgres_music_data:/var/lib/postgresql/data
 
   postgres_auth_service:
-    image: postgres
+    image: postgres:16
     container_name: postgres_auth_service
     environment:
       POSTGRES_DB: auth_db
