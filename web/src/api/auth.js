@@ -18,7 +18,19 @@ export const authAPI = {
 
   // Register new user
   register: async (userData) => {
-    const response = await api.post('/user/create-user', userData);
+    // Ensure all required fields are present with correct format
+    const requestData = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      country: userData.country,
+      bio: userData.bio || '',
+      profilePicture: userData.profilePicture || ''
+    };
+    
+    const response = await api.post('/user/create-user', requestData);
     return response.data; // Returns user UUID
   },
 
