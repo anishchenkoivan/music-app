@@ -244,26 +244,6 @@ See [API Reference](API-REFERENCE.md) for complete documentation.
 - ✅ Full-text search
 - ✅ Listening history and analytics
 
-### Planned Features
-- [ ] Integration with 3rd party music APIs (Spotify, MusicBrainz)
-- [ ] Recommendation engine
-- [ ] Social features (following, sharing)
-- [ ] Mobile push notifications
-- [ ] Collaborative playlists
-- [ ] Track lyrics support
-- [ ] Music charts and trending
-- [ ] Artist verification system
-
-## 📞 Support
-
-- **Documentation**: You're reading it!
-- **Issues**: [GitHub Issues](https://github.com/yourusername/music-app/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/music-app/discussions)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🙏 Acknowledgments
 
 - Spring Boot and Spring Cloud teams
