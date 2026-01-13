@@ -2,8 +2,12 @@ import api from './axios.js';
 
 export const playlistAPI = {
   createPlaylist: async (title, isPublic = true) => {
-    const response = await api.post('/playlists/create', { title, isPublic });
-    return response.data; // { playlistId }
+    const response = await api.post('/playlists/create', {
+      title,
+      isPublic,
+      tracks: []
+    });
+    return response.data;
   },
 
   getPlaylist: async (playlistId) => {
@@ -31,9 +35,9 @@ export const playlistAPI = {
     return response.data;
   },
 
-  getUserPlaylists: async () => {
-    const response = await api.get('/playlists/user');
-    return response.data;
+  getUserPlaylists: async (userId) => {
+    const response = await api.get(`/user-music/${userId}/playlists`);
+    return response.data.playlists || [];
   },
 
   getFavorites: async () => {

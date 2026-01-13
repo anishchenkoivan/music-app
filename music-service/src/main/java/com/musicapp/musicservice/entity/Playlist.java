@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Playlist {
     @Id
+    @GeneratedValue
     private UUID id;
     private UUID userId;
     private String title;

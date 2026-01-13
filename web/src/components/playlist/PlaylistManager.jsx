@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { playlistAPI } from '../../api/playlist.js';
 import { usePlayerStore } from '../../store/playerStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 
 export default function PlaylistManager() {
   const [playlists, setPlaylists] = useState([]);
@@ -10,14 +11,17 @@ export default function PlaylistManager() {
   const [loading, setLoading] = useState(false);
   
   const playQueue = usePlayerStore(state => state.playQueue);
+  const userId = useAuthStore(state => state.userId);
 
   useEffect(() => {
-    fetchPlaylists();
-  }, []);
+    if (userId) {
+      fetchPlaylists();
+    }
+  }, [userId]);
 
   const fetchPlaylists = async () => {
     try {
-      const data = await playlistAPI.getUserPlaylists();
+      const data = await playlistAPI.getUserPlaylists(userId);
       setPlaylists(data);
     } catch (err) {
       console.error('Error fetching playlists:', err);

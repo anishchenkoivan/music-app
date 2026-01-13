@@ -38,6 +38,7 @@ public class PlaylistFactory {
     @Transactional(propagation = Propagation.REQUIRED)
     public Playlist playlist(String title, UUID userId, boolean isPublic, List<TrackView> tracks) {
         Playlist playlist = new Playlist();
+        playlist.setUserId(userId);
         playlist.setTitle(title);
         playlist.setPublic(isPublic);
         for (TrackView track : tracks) {

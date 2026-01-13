@@ -31,6 +31,7 @@ public class UploadKafkaProducer {
 
     public void trackUploaded(TrackUploadedEvent event) {
         String json = null;
+        System.out.println("\n\n\n\n\n TRACK UPLOADED TO KAFKA \n\n\n\n\n");
         try {
             json = objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {

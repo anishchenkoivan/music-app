@@ -11,12 +11,11 @@ export const musicAPI = {
     return response.data; // { trackId, uploadToken }
   },
 
-  uploadAudioFile: async (trackId, file, uploadToken, onProgress) => {
+  uploadAudioFile: async (file, uploadToken, onProgress) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('id', trackId);
 
-    const response = await api.post('/audio/stream/upload', formData, {
+    const response = await api.post('/audio/upload', formData, {
       headers: {
         'Authorization': `Bearer ${uploadToken}`,
         'Content-Type': 'multipart/form-data'
@@ -100,6 +99,16 @@ export const musicAPI = {
   getUserArtists: async (userId) => {
     const response = await api.get(`/artists/user/${userId}`);
     return response.data;
+  },
+
+  getAllArtists: async () => {
+    const response = await api.get('/artists/all');
+    return response.data.artists || [];
+  },
+
+  getAllAlbums: async () => {
+    const response = await api.get('/albums/all');
+    return response.data.albums || [];
   },
 
   getStreamUrl: (trackId) => {

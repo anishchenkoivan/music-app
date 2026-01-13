@@ -26,19 +26,19 @@ public class PlaylistController {
         return UUID.fromString(authentication.getPrincipal().toString());
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/create")
+    public PlaylistCreateResponse createPlaylist(@RequestBody PlaylistModifyRequest playlistModifyRequest) {
+        return playlistService.createPlaylist(playlistModifyRequest, getAuthenticatedUserId());
+    }
+
+    @GetMapping("/get/{id}")
     public PlaylistDto getPlaylistById(@PathVariable("id") UUID id) {
         UUID authenticatedUserId = getAuthenticatedUserId();
         return playlistService.getPlaylistById(id, authenticatedUserId);
     }
 
-    @PostMapping("/create")
-    public PlaylistCreateResponse createPlaylist(PlaylistModifyRequest playlistModifyRequest) {
-        return playlistService.createPlaylist(playlistModifyRequest, getAuthenticatedUserId());
-    }
-
     @PutMapping("/{id}/update")
-    public void updatePlaylist(@PathVariable("id") UUID id, PlaylistModifyRequest playlistModifyRequest) {
+    public void updatePlaylist(@PathVariable("id") UUID id, @RequestBody PlaylistModifyRequest playlistModifyRequest) {
         playlistService.updatePlaylist(id, playlistModifyRequest);
     }
 }

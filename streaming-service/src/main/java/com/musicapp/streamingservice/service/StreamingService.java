@@ -52,8 +52,9 @@ public class StreamingService {
         if (!audioUtil.isMp3File(file)) {
             throw new IllegalArgumentException("File is not an mp3 file");
         }
-        TrackUploadedEvent event = new TrackUploadedEvent(UUID.fromString(id), (int) audioUtil.getMp3Duration(file));
+        long duration = audioUtil.getMp3Duration(file);
         streamingRepository.save(file, id + ".mp3");
+        TrackUploadedEvent event = new TrackUploadedEvent(UUID.fromString(id), (int) duration);
         uploadKafkaProducer.trackUploaded(event);
     }
 }

@@ -3,6 +3,7 @@ package com.musicapp.musicservice.service;
 import com.musicapp.musicservice.dto.ArtistDto;
 import com.musicapp.musicservice.dto.request.ArtistModifyRequest;
 import com.musicapp.musicservice.dto.response.artist.ArtistCreateResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistsListResponse;
 import com.musicapp.musicservice.entity.Artist;
 import com.musicapp.musicservice.repository.ArtistRepository;
 import com.musicapp.musicservice.service.events.ArtistCreatedEvent;
@@ -75,5 +76,12 @@ public class ArtistService {
     @Transactional(readOnly = true)
     public List<ArtistDto> getArtistsById(List<UUID> ids) {
         return artistRepository.findAllById(ids).stream().map(ArtistFactory::toArtistDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ArtistsListResponse getAll() {
+        return new ArtistsListResponse(
+                artistRepository.findAll().stream().map(ArtistFactory::toArtistDto).toList()
+        );
     }
 }

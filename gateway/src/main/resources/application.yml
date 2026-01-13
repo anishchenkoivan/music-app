@@ -55,7 +55,7 @@ spring:
             - id: music-service-user
               uri: lb://music-service
               predicates:
-                - Path=/api/user/music/**
+                - Path=/api/user-music/**
               filters:
                 - StripPrefix=1
 

@@ -11,7 +11,27 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
+    // Don't overwrite Authorization header if it's already set (e.g., for upload tokens)
+    if (config.headers.Authorization) {
+      return config;
+    }
+    
+    // Try to get token from direct localStorage first (set by authAPI.login)
+    let token = localStorage.getItem('auth_token');
+    
+    // If not found, try to get from zustand persisted storage
+    if (!token) {
+      try {
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          const parsed = JSON.parse(authStorage);
+          token = parsed.state?.token;
+        }
+      } catch (e) {
+        console.error('Failed to parse auth storage:', e);
+      }
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -51,7 +51,7 @@ public class TrackController {
     }
 
     @PatchMapping("/{id}/modify")
-    public void modifyTrackView(@PathVariable("id") UUID id, TrackViewModifyRequest request) {
+    public void modifyTrackView(@PathVariable("id") UUID id, @RequestBody TrackViewModifyRequest request) {
         trackService.updateTrackView(id, request);
     }
 

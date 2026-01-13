@@ -2,6 +2,7 @@ package com.musicapp.musicservice.service;
 
 import com.musicapp.musicservice.dto.PlaylistDto;
 import com.musicapp.musicservice.dto.request.PlaylistModifyRequest;
+import com.musicapp.musicservice.dto.response.playlist.PlaylistCollectionResponse;
 import com.musicapp.musicservice.dto.response.playlist.PlaylistCreateResponse;
 import com.musicapp.musicservice.entity.Playlist;
 import com.musicapp.musicservice.entity.PlaylistSpecialType;
@@ -9,6 +10,7 @@ import com.musicapp.musicservice.entity.TrackView;
 import com.musicapp.musicservice.exception.AccessException;
 import com.musicapp.musicservice.repository.PlaylistRepository;
 import com.musicapp.musicservice.util.PlaylistFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -91,5 +93,15 @@ public class PlaylistService {
     @Transactional(propagation = Propagation.REQUIRED)
     public PlaylistDto getUserFavorites(UUID userId) {
         return playlistFactory.toPlaylistDto(getUserFavoritesEntity(userId));
+    }
+
+    @Transactional
+    public PlaylistCollectionResponse getUserPlaylists(UUID userId) {
+        return new PlaylistCollectionResponse(
+                playlistRepository.findByUserId(userId).orElse(List.of())
+                        .stream()
+                        .map(playlistFactory::toPlaylistDto)
+                        .toList()
+        );
     }
 }

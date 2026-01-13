@@ -10,6 +10,8 @@ import TrackUpload from './components/upload/TrackUpload.jsx';
 import SearchBar from './components/search/SearchBar.jsx';
 import PlaylistManager from './components/playlist/PlaylistManager.jsx';
 import ThemeToggle from './components/theme/ThemeToggle.jsx';
+import UserProfile from './components/profile/UserProfile.jsx';
+import Library from './components/library/Library.jsx';
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -21,13 +23,13 @@ function Home() {
     <div className="home">
       <h1>Music Streaming App</h1>
       <SearchBar />
-      <p>Search for music or browse your library</p>
+      <Library />
     </div>
   );
 }
 
 export default function App() {
-  const { isAuthenticated, logout, user } = useAuthStore();
+  const { isAuthenticated, logout, user, userId } = useAuthStore();
   const theme = useThemeStore(state => state.theme);
 
   useEffect(() => {
@@ -39,12 +41,12 @@ export default function App() {
       <div className="app">
         <header className="app-header">
           <nav>
-            <Link to="/">🎵 Home</Link>
+            <Link to="">🎵 Home</Link>
             {isAuthenticated ? (
               <>
                 <Link to="/upload">📤 Upload</Link>
                 <Link to="/playlists">📋 Playlists</Link>
-                <span>👋 Welcome, {user?.username || 'User'}</span>
+                <Link to={`/profile/${userId}`}>👋 Welcome, {user?.username || 'User'}</Link>
                 <ThemeToggle />
                 <button onClick={logout}>🚪 Logout</button>
               </>
@@ -78,6 +80,15 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <PlaylistManager />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/profile/:id"
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
                 </ProtectedRoute>
               }
             />

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { musicAPI } from '../../api/music.js';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore.js';
 
 export default function TrackUpload() {
   const [step, setStep] = useState(1);
@@ -15,24 +16,26 @@ export default function TrackUpload() {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+  const userId = useAuthStore(state => state.userId);
 
   useEffect(() => {
     const fetchUserArtists = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
         if (userId) {
-          const artists = await musicAPI.getUserArtists(userId);
-          setUserArtists(Array.isArray(artists) ? artists : [artists]);
-          if (artists && (Array.isArray(artists) ? artists.length > 0 : true)) {
-            setArtistId(Array.isArray(artists) ? artists[0].id : artists.id);
+          const artist = await musicAPI.getUserArtists(userId);
+          // API returns a single artist object, not an array
+          if (artist && artist.id) {
+            setUserArtists([artist]);
+            setArtistId(artist.id);
           }
         }
       } catch (err) {
         console.error('Error fetching artists:', err);
+        // Artist profile might not exist yet
       }
     };
     fetchUserArtists();
-  }, []);
+  }, [userId]);
 
   const handleMetadataSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ export default function TrackUpload() {
       
       const response = await musicAPI.uploadTrackMetadata(title, [artistId]);
       
-      setTrackId(response.trackId);
+      setTrackId(response.id);
       setUploadToken(response.uploadToken);
       setStep(2);
     } catch (err) {
@@ -95,7 +98,6 @@ export default function TrackUpload() {
 
     try {
       await musicAPI.uploadAudioFile(
-        trackId,
         file,
         uploadToken,
         setUploadProgress
