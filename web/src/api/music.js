@@ -112,6 +112,7 @@ export const musicAPI = {
   },
 
   getStreamUrl: (trackId) => {
+    // Return the music service stream endpoint which redirects to streaming service with token
     return `${api.defaults.baseURL}/stream/${trackId}`;
   }
 };

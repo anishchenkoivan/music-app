@@ -11,7 +11,7 @@ export const playlistAPI = {
   },
 
   getPlaylist: async (playlistId) => {
-    const response = await api.get(`/playlists/${playlistId}`);
+    const response = await api.get(`/playlists/get/${playlistId}`);
     return response.data;
   },
 

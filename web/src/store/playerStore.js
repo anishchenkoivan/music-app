@@ -9,6 +9,7 @@ export const usePlayerStore = create((set, get) => ({
   volume: 1,
   repeat: 'off', // 'off', 'one', 'all'
   shuffle: false,
+  audioRef: null,
 
   playTrack: (track) => {
     set({
@@ -85,6 +86,18 @@ export const usePlayerStore = create((set, get) => ({
 
   setDuration: (duration) => {
     set({ duration });
+  },
+
+  setAudioRef: (ref) => {
+    set({ audioRef: ref });
+  },
+
+  seek: (time) => {
+    const { audioRef } = get();
+    if (audioRef && audioRef.current) {
+      audioRef.current.currentTime = time;
+      set({ currentTime: time });
+    }
   },
 
   toggleRepeat: () => {

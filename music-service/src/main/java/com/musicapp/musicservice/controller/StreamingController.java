@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -30,18 +32,18 @@ public class StreamingController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> stream(@PathVariable UUID id) {
+    public ResponseEntity<Map<String, String>> stream(@PathVariable UUID id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UUID userId = UUID.fromString(authentication.getPrincipal().toString());
 
         StreamingResponse streamingResponse = actionService.listen(id, userId);
 
-        String redirectUrl = UriComponentsBuilder
-                .fromUriString(streamingServiceUrl)
-                .pathSegment("audio", id.toString())
-                .queryParam("token", streamingResponse.hmacToken())
-                .toUriString();
+        // Return relative URL so it goes through the gateway/proxy
+        String streamUrl = "/audio/" + id.toString() + "?token=" + streamingResponse.hmacToken();
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("url", streamUrl);
 
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirectUrl)).build();
+        return ResponseEntity.ok(response);
     }
 }

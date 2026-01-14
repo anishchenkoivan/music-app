@@ -21,15 +21,27 @@ public class Range {
     public long fileSize() { return fileSize; }
 
     public static Range parse(String header, long totalSize) {
-        if (header == null || !header.startsWith("bytes=")) return new Range(0, totalSize - 1, true, totalSize);
+        // No range header means serve the entire file
+        if (header == null || !header.startsWith("bytes=")) {
+            return new Range(0, totalSize - 1, false, totalSize);
+        }
+        
+        // Parse range header like "bytes=0-1023" or "bytes=1024-"
         String[] parts = header.substring(6).split("-");
         long start = Long.parseLong(parts[0]);
-        boolean partial = true;
         long end = totalSize - 1;
+        
+        // If end is specified in the range, use it
         if (parts.length > 1 && !parts[1].isEmpty()) {
             end = Long.parseLong(parts[1]);
-            partial = false;
         }
-        return new Range(start, end, partial, totalSize);
+        
+        // Ensure end doesn't exceed file size
+        if (end >= totalSize) {
+            end = totalSize - 1;
+        }
+        
+        // It's a partial content if we have a range header
+        return new Range(start, end, true, totalSize);
     }
 }

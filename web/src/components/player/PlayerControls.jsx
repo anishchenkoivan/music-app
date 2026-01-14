@@ -13,6 +13,7 @@ export default function PlayerControls() {
     playNext,
     playPrevious,
     setVolume,
+    seek,
     toggleRepeat,
     toggleShuffle
   } = usePlayerStore();
@@ -25,13 +26,11 @@ export default function PlayerControls() {
   };
 
   const handleSeek = (e) => {
-    const audio = document.querySelector('audio');
-    if (audio) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percentage = x / rect.width;
-      audio.currentTime = percentage * duration;
-    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = percentage * duration;
+    seek(newTime);
   };
 
   if (!currentTrack) {

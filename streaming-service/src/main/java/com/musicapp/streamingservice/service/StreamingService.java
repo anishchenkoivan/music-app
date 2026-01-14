@@ -37,7 +37,10 @@ public class StreamingService {
         String fileName = id + ".mp3";
         long fileSize = streamingRepository.size(fileName);
         Range range = Range.parse(requestedRange, fileSize);
-        InputStream objectStream = streamingRepository.stream(fileName, range.start(), range.end());
+        
+        // Calculate the actual length to read (end - start + 1)
+        long length = range.length();
+        InputStream objectStream = streamingRepository.stream(fileName, range.start(), length);
 
         StreamingResponseBody body = outputStream -> {
             try {
@@ -52,9 +55,8 @@ public class StreamingService {
         if (!audioUtil.isMp3File(file)) {
             throw new IllegalArgumentException("File is not an mp3 file");
         }
-        long duration = audioUtil.getMp3Duration(file);
+        TrackUploadedEvent event = new TrackUploadedEvent(UUID.fromString(id), (int) audioUtil.getMp3Duration(file));
         streamingRepository.save(file, id + ".mp3");
-        TrackUploadedEvent event = new TrackUploadedEvent(UUID.fromString(id), (int) duration);
         uploadKafkaProducer.trackUploaded(event);
     }
 }
