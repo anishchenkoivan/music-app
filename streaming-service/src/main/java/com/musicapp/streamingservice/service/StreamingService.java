@@ -37,7 +37,10 @@ public class StreamingService {
         String fileName = id + ".mp3";
         long fileSize = streamingRepository.size(fileName);
         Range range = Range.parse(requestedRange, fileSize);
-        InputStream objectStream = streamingRepository.stream(fileName, range.start(), range.end());
+        
+        // Calculate the actual length to read (end - start + 1)
+        long length = range.length();
+        InputStream objectStream = streamingRepository.stream(fileName, range.start(), length);
 
         StreamingResponseBody body = outputStream -> {
             try {

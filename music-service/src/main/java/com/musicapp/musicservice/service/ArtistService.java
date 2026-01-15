@@ -3,7 +3,10 @@ package com.musicapp.musicservice.service;
 import com.musicapp.musicservice.dto.ArtistDto;
 import com.musicapp.musicservice.dto.request.ArtistModifyRequest;
 import com.musicapp.musicservice.dto.response.artist.ArtistCreateResponse;
+import com.musicapp.musicservice.dto.response.artist.ArtistsListResponse;
+import com.musicapp.musicservice.dto.response.user.PublicUserDetailsDtoResponse;
 import com.musicapp.musicservice.entity.Artist;
+import com.musicapp.musicservice.gateway.UserClient;
 import com.musicapp.musicservice.repository.ArtistRepository;
 import com.musicapp.musicservice.service.events.ArtistCreatedEvent;
 import com.musicapp.musicservice.util.ArtistFactory;
@@ -21,14 +24,17 @@ import java.util.UUID;
 public class ArtistService {
     private final ArtistRepository artistRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserClient userClient;
 
     @Autowired
     public ArtistService(
             ArtistRepository artistRepository,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            UserClient userClient
     ) {
         this.artistRepository = artistRepository;
         this.eventPublisher = eventPublisher;
+        this.userClient = userClient;
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +67,8 @@ public class ArtistService {
         if (existingArtist.isPresent()) {
             return existingArtist.get();
         }
-        Artist newArtist = createArtistEntity(new ArtistModifyRequest(userId.toString()));
+        PublicUserDetailsDtoResponse userDetails = userClient.getUserDetails(userId.toString());
+        Artist newArtist = createArtistEntity(new ArtistModifyRequest(userDetails.username()));
         newArtist.setUserId(userId);
         artistRepository.save(newArtist);
         return newArtist;
@@ -75,5 +82,12 @@ public class ArtistService {
     @Transactional(readOnly = true)
     public List<ArtistDto> getArtistsById(List<UUID> ids) {
         return artistRepository.findAllById(ids).stream().map(ArtistFactory::toArtistDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ArtistsListResponse getAll() {
+        return new ArtistsListResponse(
+                artistRepository.findAll().stream().map(ArtistFactory::toArtistDto).toList()
+        );
     }
 }

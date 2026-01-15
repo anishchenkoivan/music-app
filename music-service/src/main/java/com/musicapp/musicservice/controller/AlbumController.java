@@ -4,6 +4,7 @@ import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
 import com.musicapp.musicservice.dto.request.AlbumGeneralCreateRequest;
 import com.musicapp.musicservice.dto.response.album.AlbumCreateResponse;
+import com.musicapp.musicservice.dto.response.album.AlbumListResponse;
 import com.musicapp.musicservice.service.AlbumService;
 import com.musicapp.musicservice.service.ArtistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +42,10 @@ public class AlbumController {
                 LocalDate.now(),
                 request
         ));
+    }
+
+    @GetMapping("/all")
+    AlbumListResponse getAlbums() {
+        return albumService.getAll();
     }
 }

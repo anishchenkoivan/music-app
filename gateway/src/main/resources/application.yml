@@ -25,67 +25,67 @@ spring:
                 - StripPrefix=1
 
             - id: music-service-albums
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
                 - Path=/api/albums/**
               filters:
                 - StripPrefix=1
 
             - id: music-service-tracks
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
                 - Path=/api/tracks/**
               filters:
                 - StripPrefix=1
 
             - id: music-service-artists
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
                 - Path=/api/artists/**
               filters:
                 - StripPrefix=1
 
             - id: music-service-playlists
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
                 - Path=/api/playlists/**
               filters:
                 - StripPrefix=1
 
             - id: music-service-user
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
-                - Path=/api/user/music/**
+                - Path=/api/user-music/**
               filters:
                 - StripPrefix=1
 
             - id: music-service-search
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
                 - Path=/api/search
               filters:
                 - StripPrefix=1
 
             - id: music-service-stream
-              uri: lb:music-service
+              uri: lb://music-service
               predicates:
                 - Path=/api/stream/**
               filters:
                 - StripPrefix=1
 
             - id: streaming-service-stream
-              uri: lb:streaming-service
+              uri: lb://streaming-service
               predicates:
                 - Path=/api/audio/**
               filters:
                 - StripPrefix=1
 
             - id: image-service
-            - uri: lb:image-service
-            - predicates:
+              uri: lb://image-service
+              predicates:
                 - Path=/api/images/**
-            - filters:
-              - StripPrefix=1
+              filters:
+                - StripPrefix=1
 
 eureka:
   client:

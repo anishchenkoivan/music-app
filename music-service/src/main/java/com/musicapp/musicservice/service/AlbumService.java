@@ -2,11 +2,14 @@ package com.musicapp.musicservice.service;
 
 import com.musicapp.musicservice.dto.AlbumDto;
 import com.musicapp.musicservice.dto.request.AlbumCreateRequest;
+import com.musicapp.musicservice.dto.request.AlbumGeneralCreateRequest;
 import com.musicapp.musicservice.dto.request.TrackViewCreateRequest;
 import com.musicapp.musicservice.dto.response.album.AlbumCreateResponse;
+import com.musicapp.musicservice.dto.response.album.AlbumListResponse;
 import com.musicapp.musicservice.dto.response.artist.ArtistAlbumsResponse;
 import com.musicapp.musicservice.entity.Album;
 import com.musicapp.musicservice.entity.Artist;
+import com.musicapp.musicservice.entity.TrackData;
 import com.musicapp.musicservice.entity.TrackView;
 import com.musicapp.musicservice.exception.CopyrightException;
 import com.musicapp.musicservice.repository.AlbumRepository;
@@ -19,8 +22,10 @@ import com.musicapp.musicservice.util.TrackFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -97,5 +102,29 @@ public class AlbumService {
     @Transactional(readOnly = true)
     public List<AlbumDto> getAlbumsById(List<UUID> ids) {
         return albumRepository.findAllById(ids).stream().map(albumFactory::toAlbumDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AlbumListResponse getAll() {
+        return new AlbumListResponse(
+                albumRepository.findAll().stream()
+                        .map(albumFactory::toAlbumDto)
+                        .toList()
+        );
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void createSingleFromRawData(TrackData trackData) {
+        createAlbum(new AlbumCreateRequest(
+                trackData.getArtists().iterator().next().getId(),
+                LocalDate.now(),
+                new AlbumGeneralCreateRequest(
+                        trackData.getTitle(),
+                        List.of(new TrackViewCreateRequest(
+                                trackData.getTitle(),
+                                trackData.getId()
+                        ))
+                )
+        ));
     }
 }

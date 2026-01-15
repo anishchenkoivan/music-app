@@ -110,11 +110,12 @@ public class TrackService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void trackDataUploaded(TrackDataUploadedEvent event) {
-        TrackData trackData = getTrackDataEntityById(event.trackDataId());
+    public TrackData trackDataUploaded(TrackDataUploadedEvent event) {
+        TrackData trackData = getTrackDataEntityById(event.id());
         trackData.setValid(true);
-        trackData.setDuration(event.duration());
+        trackData.setDuration(Math.max(event.duration(), 1));
         trackDataRepository.save(trackData);
+        return trackData;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

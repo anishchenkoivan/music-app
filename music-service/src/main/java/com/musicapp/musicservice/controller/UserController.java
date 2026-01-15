@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user/music")
+@RequestMapping("/user-music")
 public class UserController {
 
     private final PlaylistService playlistService;
@@ -42,6 +42,6 @@ public class UserController {
 
     @GetMapping("/{id}/playlists")
     public PlaylistCollectionResponse getUserPlaylists(@PathVariable UUID id) {
-        return null;
+        return playlistService.getUserPlaylists(id);
     }
 }
